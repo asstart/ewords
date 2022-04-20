@@ -11,6 +11,13 @@ type DatabasePages struct {
 	HasMore    *bool   `json:"has_more"`
 }
 
+type UpdatePage struct {
+	Properties PageProperties `json:"properties"`
+	Archived   *bool          `json:"archive,omitempty"`
+	Icon       *string        `json:"icon,omitempty"`
+	Cover      *string        `json:"cover,omitempty"`
+}
+
 type Page struct {
 	ID             *string     `json:"id"`
 	CreatedTime    *time.Time  `json:"created_time"`
@@ -32,13 +39,9 @@ type Parent struct {
 	Workspace  *bool   `json:"workspace,omitempty"`
 }
 
+type PageProperties map[string]PageProperty
+
 type PageProperty struct {
-	Title *string `json:"tile,omitempty"`
-}
-
-type DatabaseProperties map[string]DatabaseProperty
-
-type DatabaseProperty struct {
 	ID   *string `json:"id,omitempty"`
 	Type *string `json:"type,omitempty"`
 	Name *string `json:"name,omitempty"`
@@ -316,7 +319,7 @@ func (p *Page) UnmarshalJSON(b []byte) error {
 
 	page := dto.P
 
-	var props DatabaseProperties
+	var props PageProperties
 
 	if err := json.Unmarshal(dto.Properties, &props); err != nil {
 		return err
