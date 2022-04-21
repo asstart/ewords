@@ -24,9 +24,9 @@ type NotionClient struct {
 
 func CreateNotionClient(apiKey string) NotionClient {
 	return NotionClient{
-		BaseURL:    BaseUrl,
-		ApiVersion: V1,
-		apiKey:     apiKey,
+		BaseURL:       BaseUrl,
+		ApiVersion:    V1,
+		apiKey:        apiKey,
 		NotionVersion: "2022-02-22",
 		HttpClient: &http.Client{
 			Timeout: 10 * time.Second,

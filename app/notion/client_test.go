@@ -1,11 +1,12 @@
+//go:build integration
 // +build integration
 
 package notion
 
 import (
 	"context"
-	"testing"
 	"os"
+	"testing"
 )
 
 func TestQueryDatabase(t *testing.T) {

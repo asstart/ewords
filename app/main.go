@@ -17,7 +17,7 @@ const APIKeyEnv = "NOTION_API_KEY"
 type options struct {
 	FilePath      string
 	DirPath       string
-	NotionDB string
+	NotionDB      string
 	ExampleDir    string
 	DefenitionDir string
 	M             bool
@@ -58,13 +58,12 @@ func main() {
 	}
 
 	if (op.FilePath != "" && op.DirPath != "") ||
-	(op.FilePath != "" && op.NotionDB != "") ||
-	(op.NotionDB != "" && op.DirPath != "") {
+		(op.FilePath != "" && op.NotionDB != "") ||
+		(op.NotionDB != "" && op.DirPath != "") {
 		panic("only one option of (s, d, n) should be defined")
 	}
 
 	files := map[string][]ewords.TermSource{}
-
 
 	if op.FilePath != "" {
 		ts := parseFile(op.FilePath)

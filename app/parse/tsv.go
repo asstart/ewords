@@ -18,7 +18,7 @@ func (*TsvParser) ParseTermSource(source *string) ([]ewords.TermSource, error) {
 	lines := parseInput(&filedata)
 	res := []ewords.TermSource{}
 	for _, line := range lines {
-		if  empty(&line) {
+		if empty(&line) {
 			continue
 		}
 		ts, err := parseSingle(&line)

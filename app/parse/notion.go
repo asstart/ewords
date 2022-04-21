@@ -14,14 +14,14 @@ type NotionParser struct {
 }
 
 const (
-	termKey = "Word"
-	transKey = "Transcription"
-	defKey = "Defenition"
-	exmpKey = "Example"
+	termKey    = "Word"
+	transKey   = "Transcription"
+	defKey     = "Defenition"
+	exmpKey    = "Example"
 	handledKey = "Handled"
 )
 
-func (np *NotionParser)ParseTermSource(source *string) ([]ewords.TermSource, error) {
+func (np *NotionParser) ParseTermSource(source *string) ([]ewords.TermSource, error) {
 	pages, err := np.downloadSource(source)
 	if err != nil {
 		return nil, err
@@ -33,10 +33,10 @@ func (np *NotionParser)ParseTermSource(source *string) ([]ewords.TermSource, err
 	return ts, nil
 }
 
-func (np *NotionParser) downloadSource(source *string)([]notion.Page, error) {
+func (np *NotionParser) downloadSource(source *string) ([]notion.Page, error) {
 	nc := notion.CreateNotionClient(*np.ApiKey)
 	ctx := context.Background()
-	
+
 	var t = true
 	var h = handledKey
 	query := notion.DatabaseQuery{
@@ -64,30 +64,28 @@ func (np *NotionParser) downloadSource(source *string)([]notion.Page, error) {
 			finished = true
 		}
 	}
-	
+
 	return res, nil
 }
 
-
-
-func page2term(pages []notion.Page)([]ewords.TermSource, error) {
+func page2term(pages []notion.Page) ([]ewords.TermSource, error) {
 	var res []ewords.TermSource
 	for _, p := range pages {
 		term, errTerm := extractTextProperty(p, termKey)
 		transcription, errTrans := extractTextProperty(p, transKey)
 		defenition, errDef := extractTextProperty(p, defKey)
 		example, errExmpl := extractTextProperty(p, exmpKey)
-		
+
 		err := compose(errTerm, errTrans, errDef, errExmpl)
 		if err != nil {
 			return nil, err
 		}
 
-		ts := ewords.TermSource {
-			Term: term,
+		ts := ewords.TermSource{
+			Term:          term,
 			Transcription: transcription,
-			Definition: defenition,
-			Example: example,
+			Definition:    defenition,
+			Example:       example,
 		}
 		res = append(res, ts)
 	}
@@ -110,11 +108,11 @@ func compose(errors ...error) error {
 
 func extractTextProperty(p notion.Page, property string) (string, error) {
 	term, ok := p.Properties.(notion.PageProperties)[property]
-		if !ok {
-			return "", fmt.Errorf("property: %v not found in page: %v", property, p)
-		}
-		if len(term.RichText) != 1 {
-			return "", fmt.Errorf("property: %v is ambigious: %v", property, term.RichText)
-		} 
-		return *term.RichText[0].PlainText, nil
+	if !ok {
+		return "", fmt.Errorf("property: %v not found in page: %v", property, p)
+	}
+	if len(term.RichText) != 1 {
+		return "", fmt.Errorf("property: %v is ambigious: %v", property, term.RichText)
+	}
+	return *term.RichText[0].PlainText, nil
 }
