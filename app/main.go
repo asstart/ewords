@@ -2,16 +2,22 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"path"
 	"reflect"
 	"regexp"
+	"time"
 
 	"github.com/asstart/english-words/app/ewords"
+	"github.com/asstart/english-words/app/parse"
 )
+
+const APIKeyEnv = "NOTION_API_KEY"
 
 type options struct {
 	FilePath      string
 	DirPath       string
+	NotionDB string
 	ExampleDir    string
 	DefenitionDir string
 	M             bool
@@ -33,6 +39,7 @@ func (op *options) SetInt(field string, value *int) {
 var flags = []*ewords.FlagDef{
 	{Flag: "s", Field: "FilePath", Help: "path to the source file", Value: ""},
 	{Flag: "d", Field: "DirPath", Help: "path to the source directory", Value: ""},
+	{Flag: "n", Field: "NotionDB", Help: "Id of notion database", Value: ""},
 	{Flag: "m", Field: "M", Help: "export to memrise format", Value: false},
 	{Flag: "ex", Field: "ExampleDir", Help: "where store example output", Value: "ewords_example"},
 	{Flag: "df", Field: "DefenitionDir", Help: "where store defenition output", Value: "ewords_defenition"},
@@ -46,15 +53,18 @@ func main() {
 		panic(err)
 	}
 
-	if op.FilePath == "" && op.DirPath == "" {
-		panic("neither s nor d were defined")
+	if op.FilePath == "" && op.DirPath == "" && op.NotionDB == "" {
+		panic("neither s nor d nor n were defined")
 	}
 
-	if op.FilePath != "" && op.DirPath != "" {
-		panic("both s and d were defined")
+	if (op.FilePath != "" && op.DirPath != "") ||
+	(op.FilePath != "" && op.NotionDB != "") ||
+	(op.NotionDB != "" && op.DirPath != "") {
+		panic("only one option of (s, d, n) should be defined")
 	}
 
 	files := map[string][]ewords.TermSource{}
+
 
 	if op.FilePath != "" {
 		ts := parseFile(op.FilePath)
@@ -65,6 +75,10 @@ func main() {
 			ts := parseFile(file)
 			files[file] = ts
 		}
+	} else if op.NotionDB != "" {
+		ts := parseNotion(op.NotionDB)
+		filename := fmt.Sprintf("notion_%v", time.Now().Format(time.Stamp))
+		files[filename] = ts
 	}
 
 	if op.M {
@@ -100,15 +114,24 @@ func publishMemrise(ts []ewords.TermSource, exmplFile string, defFile string) {
 }
 
 func parseFile(file string) []ewords.TermSource {
-
-	source, err := ewords.ReadFile(&file)
+	ts, err := parse.Source2TermSource(&file, &parse.TsvParser{})
 	if err != nil {
-		panic(fmt.Sprintf("Error while reading %v - %v", file, err))
+		panic(fmt.Sprintf("Errow while parsing TSV source to TermSource- %v", err))
+
 	}
-	ts, err := ewords.Str2TermSource(&source, &ewords.TsvParser{}, &ewords.TsvParser{})
-	if err != nil {
-		panic(fmt.Sprintf("Errow while parsing source to TermSource- %v", err))
+	return ts
+}
 
+func parseNotion(db string) []ewords.TermSource {
+	var key = os.Getenv(APIKeyEnv)
+	ts, err := parse.Source2TermSource(
+		&db,
+		&parse.NotionParser{
+			ApiKey: &key,
+		},
+	)
+	if err != nil {
+		panic(fmt.Sprintf("Errow while parsing Notion source to TermSource - %v", err))
 	}
 	return ts
 }
