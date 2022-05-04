@@ -14,3 +14,9 @@ go build -o ../ewords
 ```shell
 NOTION_API_KEY="API_KEY" go test -v -tags=integration
 ```
+
+### Run with notion
+
+```shell
+NOTION_API_KEY="API_KEY" ewords -n <db_id> -m
+```

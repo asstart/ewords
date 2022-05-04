@@ -30,6 +30,10 @@ func (np *NotionParser) ParseTermSource(source *string) ([]ewords.TermSource, er
 	if err != nil {
 		return nil, err
 	}
+	err = np.markHandled(pages)
+	if err != nil {
+		return nil, err
+	}
 	return ts, nil
 }
 
@@ -37,7 +41,7 @@ func (np *NotionParser) downloadSource(source *string) ([]notion.Page, error) {
 	nc := notion.CreateNotionClient(*np.ApiKey)
 	ctx := context.Background()
 
-	var t = true
+	var t = false
 	var h = handledKey
 	query := notion.DatabaseQuery{
 		Filter: &notion.Filter{
@@ -71,7 +75,7 @@ func (np *NotionParser) downloadSource(source *string) ([]notion.Page, error) {
 func page2term(pages []notion.Page) ([]ewords.TermSource, error) {
 	var res []ewords.TermSource
 	for _, p := range pages {
-		term, errTerm := extractTextProperty(p, termKey)
+		term, errTerm := extractTitleProperty(p, termKey)
 		transcription, errTrans := extractTextProperty(p, transKey)
 		defenition, errDef := extractTextProperty(p, defKey)
 		example, errExmpl := extractTextProperty(p, exmpKey)
@@ -107,12 +111,80 @@ func compose(errors ...error) error {
 }
 
 func extractTextProperty(p notion.Page, property string) (string, error) {
-	term, ok := p.Properties.(notion.PageProperties)[property]
+	text, ok := p.Properties.(notion.PageProperties)[property]
 	if !ok {
 		return "", fmt.Errorf("property: %v not found in page: %v", property, p)
 	}
-	if len(term.RichText) != 1 {
-		return "", fmt.Errorf("property: %v is ambigious: %v", property, term.RichText)
+	if len(text.RichText) > 1 {
+		return "", fmt.Errorf("property: %v is ambigious: %v", property, text.RichText)
 	}
-	return *term.RichText[0].PlainText, nil
+	if len(text.RichText) == 0 {
+		return "", nil
+	}
+	return *text.RichText[0].PlainText, nil
+}
+
+func extractTitleProperty(p notion.Page, property string) (string, error) {
+	title, ok := p.Properties.(notion.PageProperties)[property]
+	if !ok {
+		return "", fmt.Errorf("property: %v not found in page: %v", property, p)
+	}
+	if len(title.Title) != 1 {
+		return "", fmt.Errorf("property: %v is ambigious: %v", property, title.Title)
+	}
+	return *title.Title[0].PlainText, nil
+}
+
+func (np *NotionParser) markHandled(pages []notion.Page) (error) {
+	updated := []string{}
+	for _, p := range pages {
+		nc := notion.CreateNotionClient(*np.ApiKey)
+		ctx := context.Background()
+
+		t := true
+		up := notion.UpdatePage{
+			Properties: notion.PageProperties{
+				handledKey: notion.PageProperty{
+					Checkbox: &t,
+				},
+			},
+		}
+
+		_, err := nc.UpdatePage(ctx,up, *p.ID)
+		if err == nil {
+			updated = append(updated, *p.ID)
+		} else {
+			rerr := np.rollback(updated)
+			if rerr != nil {
+				return fmt.Errorf("failed to update %v, err: %v, rollback failed: %v", p, err, rerr)
+			}
+			return fmt.Errorf("failed to update %v, err: %v, rollback successful", p, err)
+		}
+	}
+	return nil
+}
+
+func (np *NotionParser) rollback(ids []string)(error) {
+	rolbacked := []string{}
+	for _, id := range ids {
+		nc := notion.CreateNotionClient(*np.ApiKey)
+		ctx := context.Background()
+
+		f := false
+		up := notion.UpdatePage {
+			Properties: notion.PageProperties{
+				handledKey: notion.PageProperty{
+					Checkbox: &f,
+				},
+			},
+		}
+
+		_, err := nc.UpdatePage(ctx, up, id)
+		if err != nil {
+			return fmt.Errorf("rollback unsucsessfull. Rolbacked: %v", rolbacked)
+		} else {
+			rolbacked = append(rolbacked, id)
+		}
+	}
+	return nil
 }

@@ -76,8 +76,11 @@ func main() {
 		}
 	} else if op.NotionDB != "" {
 		ts := parseNotion(op.NotionDB)
-		filename := fmt.Sprintf("notion_%v", time.Now().Format(time.Stamp))
-		files[filename] = ts
+		if len(ts) > 0 {
+			filename := fmt.Sprintf("notion_%v", time.Now().Format(time.Stamp))
+			files[filename] = ts
+		}
+		
 	}
 
 	if op.M {
