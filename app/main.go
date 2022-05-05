@@ -44,7 +44,7 @@ var flags = []*ewords.FlagDef{
 	{Flag: "sn", Field: "NotionDB", Help: "id of notion database", Value: ""},
 	{Flag: "f", Field: "ExportToFile", Help: "export to a file", Value: false},
 	{Flag: "ee", Field: "ExportExample", Help: "export examples", Value: false},
-	{Flag: "ed", Field: "ExportDefenition", Help: "export example", Value: false},
+	{Flag: "ed", Field: "ExportDefenition", Help: "export defenitions", Value: false},
 	{Flag: "ted", Field: "ExampleDir", Help: "where store example output", Value: "ewords_example"},
 	{Flag: "tdd", Field: "DefenitionDir", Help: "where store defenition output", Value: "ewords_defenition"},
 }
