@@ -15,12 +15,14 @@ import (
 const APIKeyEnv = "NOTION_API_KEY"
 
 type options struct {
-	FilePath      string
-	DirPath       string
-	NotionDB      string
-	ExampleDir    string
-	DefenitionDir string
-	M             bool
+	FilePath         string
+	DirPath          string
+	NotionDB         string
+	ExportExample    bool
+	ExportDefenition bool
+	ExampleDir       string
+	DefenitionDir    string
+	ExportToFile     bool
 }
 
 func (op *options) SetString(field string, value *string) {
@@ -37,12 +39,14 @@ func (op *options) SetInt(field string, value *int) {
 }
 
 var flags = []*ewords.FlagDef{
-	{Flag: "s", Field: "FilePath", Help: "path to the source file", Value: ""},
-	{Flag: "d", Field: "DirPath", Help: "path to the source directory", Value: ""},
-	{Flag: "n", Field: "NotionDB", Help: "Id of notion database", Value: ""},
-	{Flag: "m", Field: "M", Help: "export to memrise format", Value: false},
-	{Flag: "ex", Field: "ExampleDir", Help: "where store example output", Value: "ewords_example"},
-	{Flag: "df", Field: "DefenitionDir", Help: "where store defenition output", Value: "ewords_defenition"},
+	{Flag: "sf", Field: "FilePath", Help: "path to a source file", Value: ""},
+	{Flag: "sd", Field: "DirPath", Help: "path to a source directory", Value: ""},
+	{Flag: "sn", Field: "NotionDB", Help: "id of notion database", Value: ""},
+	{Flag: "f", Field: "ExportToFile", Help: "export to a file", Value: false},
+	{Flag: "ee", Field: "ExportExample", Help: "export examples", Value: false},
+	{Flag: "ed", Field: "ExportDefenition", Help: "export example", Value: false},
+	{Flag: "ted", Field: "ExampleDir", Help: "where store example output", Value: "ewords_example"},
+	{Flag: "tdd", Field: "DefenitionDir", Help: "where store defenition output", Value: "ewords_defenition"},
 }
 
 var op = options{}
@@ -66,56 +70,77 @@ func main() {
 	files := map[string][]ewords.TermSource{}
 
 	if op.FilePath != "" {
-		ts := parseFile(op.FilePath)
+		ts := parseFileCmd(op.FilePath)
 		files[op.FilePath] = ts
 	} else if op.DirPath != "" {
-		lf := parseDir(op.DirPath)
+		lf := parseDirCmd(op.DirPath)
 		for _, file := range lf {
-			ts := parseFile(file)
+			ts := parseFileCmd(file)
 			files[file] = ts
 		}
 	} else if op.NotionDB != "" {
-		ts := parseNotion(op.NotionDB)
+		ts := parseNotionCmd(op.NotionDB)
 		if len(ts) > 0 {
 			filename := fmt.Sprintf("notion_%v", time.Now().Format(time.Stamp))
 			files[filename] = ts
 		}
-		
+
 	}
 
-	if op.M {
+	if op.ExportToFile {
 		for file, ts := range files {
-			publishMemriseCmd(file, ts)
+			if op.ExportExample {
+				exportExamplesCmd(file, ts)
+			}
+			if op.ExportDefenition {
+				exportDefenitionsCmd(file, ts)
+			}
 		}
 
 	}
 
 }
 
-func publishMemriseCmd(file string, ts []ewords.TermSource) {
+func exportExamplesCmd(file string, ts []ewords.TermSource) {
 	filename := path.Base(file)
 	pattern, _ := regexp.Compile("[.]")
 	eout := pattern.ReplaceAllString(filename, "-examples.")
+	exportExamples(ts, path.Join(op.ExampleDir, eout))
+}
+
+func exportDefenitionsCmd(file string, ts []ewords.TermSource) {
+	filename := path.Base(file)
+	pattern, _ := regexp.Compile("[.]")
 	dout := pattern.ReplaceAllString(filename, "-defenitions.")
-	publishMemrise(ts, path.Join(op.ExampleDir, eout), path.Join(op.DefenitionDir, dout))
+	exportDefenitions(ts, path.Join(op.DefenitionDir, dout))
 }
 
-func publishMemrise(ts []ewords.TermSource, exmplFile string, defFile string) {
-	ep := ewords.MemriseExamplePublisher{
+func exportExamples(ts []ewords.TermSource, exmplFile string) {
+	ep := ewords.ExampleFileExporter{
 		FilePath:        exmplFile,
-		Formatter:       &ewords.MemriseFormatter{},
-		OutputFormatter: &ewords.MemriseFormatter{},
+		Formatter:       &ewords.SimpleTsv{},
+		OutputFormatter: &ewords.SimpleTsv{},
 	}
-	dp := ewords.MemriseDefenitionPublisher{
-		FilePath:        defFile,
-		Formatter:       &ewords.MemriseFormatter{},
-		OutputFormatter: &ewords.MemriseFormatter{},
+
+	err := ep.ExportExample(ewords.ToExamples(&ewords.DefaultTerm{}, ts))
+	if err != nil {
+		panic(err)
 	}
-	ep.PublishExample(ewords.ToExamples(&ewords.DefaultTerm{}, ts))
-	dp.PublishDefenition(ewords.ToDefenitions(&ewords.DefaultTerm{}, ts))
 }
 
-func parseFile(file string) []ewords.TermSource {
+func exportDefenitions(ts []ewords.TermSource, defFile string) {
+	dp := ewords.DefenitionFileExporter{
+		FilePath:        defFile,
+		Formatter:       &ewords.SimpleTsv{},
+		OutputFormatter: &ewords.SimpleTsv{},
+	}
+	err := dp.ExportDefenition(ewords.ToDefenitions(&ewords.DefaultTerm{}, ts))
+	if err != nil {
+		panic(err)
+	}
+}
+
+func parseFileCmd(file string) []ewords.TermSource {
 	ts, err := parse.Source2TermSource(&file, &parse.TsvParser{})
 	if err != nil {
 		panic(fmt.Sprintf("Errow while parsing TSV source to TermSource- %v", err))
@@ -124,7 +149,7 @@ func parseFile(file string) []ewords.TermSource {
 	return ts
 }
 
-func parseNotion(db string) []ewords.TermSource {
+func parseNotionCmd(db string) []ewords.TermSource {
 	var key = os.Getenv(APIKeyEnv)
 	ts, err := parse.Source2TermSource(
 		&db,
@@ -138,11 +163,10 @@ func parseNotion(db string) []ewords.TermSource {
 	return ts
 }
 
-func parseDir(dir string) []string {
+func parseDirCmd(dir string) []string {
 	paths, err := ewords.ListFiles(&dir)
 	if err != nil {
 		panic(fmt.Sprintf("can't list files in: %v, %v", dir, err))
 	}
 	return paths
-
 }

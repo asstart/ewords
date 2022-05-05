@@ -135,7 +135,7 @@ func extractTitleProperty(p notion.Page, property string) (string, error) {
 	return *title.Title[0].PlainText, nil
 }
 
-func (np *NotionParser) markHandled(pages []notion.Page) (error) {
+func (np *NotionParser) markHandled(pages []notion.Page) error {
 	updated := []string{}
 	for _, p := range pages {
 		nc := notion.CreateNotionClient(*np.ApiKey)
@@ -150,7 +150,7 @@ func (np *NotionParser) markHandled(pages []notion.Page) (error) {
 			},
 		}
 
-		_, err := nc.UpdatePage(ctx,up, *p.ID)
+		_, err := nc.UpdatePage(ctx, up, *p.ID)
 		if err == nil {
 			updated = append(updated, *p.ID)
 		} else {
@@ -164,14 +164,14 @@ func (np *NotionParser) markHandled(pages []notion.Page) (error) {
 	return nil
 }
 
-func (np *NotionParser) rollback(ids []string)(error) {
+func (np *NotionParser) rollback(ids []string) error {
 	rolbacked := []string{}
 	for _, id := range ids {
 		nc := notion.CreateNotionClient(*np.ApiKey)
 		ctx := context.Background()
 
 		f := false
-		up := notion.UpdatePage {
+		up := notion.UpdatePage{
 			Properties: notion.PageProperties{
 				handledKey: notion.PageProperty{
 					Checkbox: &f,
