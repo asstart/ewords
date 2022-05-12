@@ -2,15 +2,19 @@ package ewords
 
 import (
 	"fmt"
+
+	"github.com/spf13/afero"
 )
 
 type ExampleFileExporter struct {
+	FS              afero.Fs
 	FilePath        string
 	Formatter       TermExampleFormatter
 	OutputFormatter OutputFormatter
 }
 
 type DefenitionFileExporter struct {
+	FS              afero.Fs
 	FilePath        string
 	Formatter       TermDefenitionFormatter
 	OutputFormatter OutputFormatter
@@ -28,7 +32,7 @@ func (fp *ExampleFileExporter) ExportExample(te []TermExample) error {
 	}
 	output := fp.OutputFormatter.FormatOutput(formatted)
 
-	err := WriteFile(fp.FilePath, output)
+	err := WriteFile(fp.FilePath, output, fp.FS)
 	if err != nil {
 		return fmt.Errorf("error while exporting examples. source: %v, error: %v", te, err)
 	}
@@ -46,7 +50,7 @@ func (fp *DefenitionFileExporter) ExportDefenition(td []TermDefenition) error {
 	}
 	output := fp.OutputFormatter.FormatOutput(formatted)
 
-	err := WriteFile(fp.FilePath, output)
+	err := WriteFile(fp.FilePath, output, fp.FS)
 	if err != nil {
 		return fmt.Errorf("error while exporting defenitions. source: %v, error: %v", td, err)
 	}

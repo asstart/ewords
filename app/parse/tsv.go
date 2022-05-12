@@ -5,12 +5,15 @@ import (
 	"strings"
 
 	"github.com/asstart/english-words/app/ewords"
+	"github.com/spf13/afero"
 )
 
-type TsvParser struct{}
+type TsvParser struct {
+	FS afero.Fs
+}
 
-func (*TsvParser) ParseTermSource(source *string) ([]ewords.TermSource, error) {
-	filedata, err := ewords.ReadFile(source)
+func (tp *TsvParser) ParseTermSource(source *string) ([]ewords.TermSource, error) {
+	filedata, err := ewords.ReadFile(source, tp.FS)
 	if err != nil {
 		panic(fmt.Sprintf("Error while reading %v - %v", source, err))
 	}

@@ -1,15 +1,17 @@
 package ewords
 
 import (
+	"errors"
 	"fmt"
+	"github.com/spf13/afero"
 	"log"
-	"os"
 	"path"
 	"strings"
 )
 
-func ReadDir(dirPath *string) (map[string]string, error) {
-	entries, err := os.ReadDir(*dirPath)
+func ReadDir(dirPath *string, fs afero.Fs) (map[string]string, error) {
+	afs := &afero.Afero{Fs: fs}
+	entries, err := afs.ReadDir(*dirPath)
 	if err != nil {
 		return nil, fmt.Errorf("error while reading dir: %v - %v", dirPath, err)
 	}
@@ -19,7 +21,7 @@ func ReadDir(dirPath *string) (map[string]string, error) {
 			continue
 		}
 		filepath := path.Join(*dirPath, entry.Name())
-		data, err := ReadFile(&filepath)
+		data, err := ReadFile(&filepath, fs)
 		if err != nil {
 			return nil, fmt.Errorf("error while proccessing file: %v in the directory: %v - %v", entry, dirPath, err)
 		}
@@ -28,8 +30,9 @@ func ReadDir(dirPath *string) (map[string]string, error) {
 	return res, nil
 }
 
-func ListFiles(dirPath *string) ([]string, error) {
-	entries, err := os.ReadDir(*dirPath)
+func ListFiles(dirPath *string, fs afero.Fs) ([]string, error) {
+	afs := &afero.Afero{Fs: fs}
+	entries, err := afs.ReadDir(*dirPath)
 	if err != nil {
 		return nil, fmt.Errorf("error while reading dir: %v - %v", dirPath, err)
 	}
@@ -43,9 +46,10 @@ func ListFiles(dirPath *string) ([]string, error) {
 	return res, nil
 }
 
-func ReadFile(path *string) (string, error) {
+func ReadFile(path *string, fs afero.Fs) (string, error) {
+	afs := &afero.Afero{Fs: fs}
 	b := strings.Builder{}
-	data, err := os.ReadFile(*path)
+	data, err := afs.ReadFile(*path)
 	if err != nil {
 		et := fmt.Sprintf("Error while reading file: %v", err)
 		log.Print(et)
@@ -55,16 +59,27 @@ func ReadFile(path *string) (string, error) {
 	return b.String(), nil
 }
 
-func WriteFile(path string, data *string) error {
-	_, err := os.Stat(path)
-	if !os.IsNotExist(err) {
-		et := fmt.Sprintf("File %v - exists", path)
+func WriteFile(fpath string, data *string, fs afero.Fs) error {
+	afs := &afero.Afero{Fs: fs}
+	_, err := afs.Stat(fpath)
+	if errors.Is(err, afero.ErrFileExists) {
+		et := fmt.Sprintf("File %v - exists", fpath)
 		log.Print(et)
 		return fmt.Errorf(et)
 	}
-	err = os.WriteFile(path, []byte(*data), 0666)
+
+	dir := path.Dir(fpath)
+	de, err := afs.DirExists(dir)
 	if err != nil {
-		et := fmt.Sprintf("Error while writing to the file %v - %v", path, err)
+		return fmt.Errorf("Error while checking dir: %v existing - %v", dir, err)
+	}
+	if !de {
+		afs.MkdirAll(dir, 0777)
+	}
+
+	err = afs.WriteFile(fpath, []byte(*data), 0666)
+	if err != nil {
+		et := fmt.Sprintf("Error while writing to the file %v - %v", fpath, err)
 		log.Print(et)
 		return fmt.Errorf(et)
 	}

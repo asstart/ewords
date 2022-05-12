@@ -10,9 +10,12 @@ import (
 
 	"github.com/asstart/english-words/app/ewords"
 	"github.com/asstart/english-words/app/parse"
+	"github.com/spf13/afero"
 )
 
 const APIKeyEnv = "NOTION_API_KEY"
+
+var AppFS = afero.NewOsFs()
 
 type options struct {
 	FilePath         string
@@ -117,6 +120,7 @@ func exportDefenitionsCmd(file string, ts []ewords.TermSource) {
 
 func exportExamples(ts []ewords.TermSource, exmplFile string) {
 	ep := ewords.ExampleFileExporter{
+		FS:              AppFS,
 		FilePath:        exmplFile,
 		Formatter:       &ewords.SimpleTsv{},
 		OutputFormatter: &ewords.SimpleTsv{},
@@ -130,6 +134,7 @@ func exportExamples(ts []ewords.TermSource, exmplFile string) {
 
 func exportDefenitions(ts []ewords.TermSource, defFile string) {
 	dp := ewords.DefenitionFileExporter{
+		FS:              AppFS,
 		FilePath:        defFile,
 		Formatter:       &ewords.SimpleTsv{},
 		OutputFormatter: &ewords.SimpleTsv{},
@@ -141,7 +146,7 @@ func exportDefenitions(ts []ewords.TermSource, defFile string) {
 }
 
 func parseFileCmd(file string) []ewords.TermSource {
-	ts, err := parse.Source2TermSource(&file, &parse.TsvParser{})
+	ts, err := parse.Source2TermSource(&file, &parse.TsvParser{FS: AppFS})
 	if err != nil {
 		panic(fmt.Sprintf("Errow while parsing TSV source to TermSource- %v", err))
 
@@ -164,7 +169,7 @@ func parseNotionCmd(db string) []ewords.TermSource {
 }
 
 func parseDirCmd(dir string) []string {
-	paths, err := ewords.ListFiles(&dir)
+	paths, err := ewords.ListFiles(&dir, AppFS)
 	if err != nil {
 		panic(fmt.Sprintf("can't list files in: %v, %v", dir, err))
 	}
