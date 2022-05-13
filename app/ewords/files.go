@@ -13,7 +13,7 @@ func ReadDir(dirPath *string, fs afero.Fs) (map[string]string, error) {
 	afs := &afero.Afero{Fs: fs}
 	entries, err := afs.ReadDir(*dirPath)
 	if err != nil {
-		return nil, fmt.Errorf("error while reading dir: %v - %v", dirPath, err)
+		return nil, fmt.Errorf("error while reading dir: %v - %v", *dirPath, err)
 	}
 	res := map[string]string{}
 	for _, entry := range entries {
@@ -34,7 +34,7 @@ func ListFiles(dirPath *string, fs afero.Fs) ([]string, error) {
 	afs := &afero.Afero{Fs: fs}
 	entries, err := afs.ReadDir(*dirPath)
 	if err != nil {
-		return nil, fmt.Errorf("error while reading dir: %v - %v", dirPath, err)
+		return nil, fmt.Errorf("error while reading dir: %v - %v", *dirPath, err)
 	}
 	res := []string{}
 	for _, entry := range entries {
@@ -51,7 +51,7 @@ func ReadFile(path *string, fs afero.Fs) (string, error) {
 	b := strings.Builder{}
 	data, err := afs.ReadFile(*path)
 	if err != nil {
-		et := fmt.Sprintf("Error while reading file: %v", err)
+		et := fmt.Sprintf("Error while reading file %v - %v", *path, err)
 		log.Print(et)
 		return "", fmt.Errorf(et)
 	}

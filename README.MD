@@ -40,3 +40,15 @@ NOTION_API_KEY="API_KEY" go test -v -tags=integration
 ```shell
 NOTION_API_KEY="API_KEY" ewords -n <db_id> -f -ted -tdd
 ```
+
+### Run tests from all packages
+
+```shell
+go test ./...
+```
+
+### Run tests from all packages by tag with set env var
+
+```shell
+ NOTION_API_KEY=<API_KEY>  go test ./... --tags=integration
+```

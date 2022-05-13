@@ -1,4 +1,4 @@
-package notion
+package utils
 
 import (
 	"reflect"
@@ -29,28 +29,43 @@ func IntPtr(f int) *int {
 	return &f
 }
 
+//TODO Need to make more clever solution for minimizing, at least in which spaces inside quotes won't be removed
 func Minimise(jsn string) string {
 	re, _ := regexp.Compile(`[\s\n]`)
 	return strings.TrimSpace(re.ReplaceAllString(jsn, ""))
 }
 
 func AssertNil(t *testing.T, actual interface{}) {
-
-	if reflect.ValueOf(actual).Kind() == reflect.Ptr && reflect.ValueOf(actual).IsNil() {
-		t.Logf(`%s
-		Expected:%v
-		Actual:  %v
-		`, success, nil, actual)
+	t.Helper()
+	if actual == nil ||
+		((reflect.ValueOf(actual).Kind() == reflect.Ptr ||
+			reflect.ValueOf(actual).Kind() == reflect.Map ||
+			reflect.ValueOf(actual).Kind() == reflect.Slice) &&
+			reflect.ValueOf(actual).IsNil()) {
+		t.Logf(`%s Value is nill`, success)
 	} else {
-		t.Fatalf(`%s
-	    Expected:%v
-	    Actual:  %v
-	    `, failed, nil, actual)
+		t.Fatalf(`%s Expected nil value, but: %v`, failed, actual)
 	}
+}
 
+func AssertNotNill(t *testing.T, actual interface{}) {
+	t.Helper()
+	if (reflect.ValueOf(actual).Kind() == reflect.Ptr ||
+		reflect.ValueOf(actual).Kind() == reflect.Map ||
+		reflect.ValueOf(actual).Kind() == reflect.Slice) && !reflect.ValueOf(actual).IsNil() {
+		t.Logf(`%s %v - Not nill`, success, actual)
+	} else {
+		t.Fatalf(`%s Exptected not nil`, failed)
+	}
+}
+
+func AssertEmptyString(t *testing.T, actual string) {
+	t.Helper()
+	AssertEqualsString(t, "", actual)
 }
 
 func AssertEqualsString(t *testing.T, expected string, actual string) {
+	t.Helper()
 	if expected != actual {
 		t.Fatalf(`%s
 		Expected:%v
@@ -64,6 +79,7 @@ func AssertEqualsString(t *testing.T, expected string, actual string) {
 }
 
 func AssertEqualsBool(t *testing.T, expected bool, actual bool) {
+	t.Helper()
 	if expected != actual {
 		t.Fatalf(`%s
 		Expected:%v
@@ -77,6 +93,7 @@ func AssertEqualsBool(t *testing.T, expected bool, actual bool) {
 }
 
 func AssertEqualsFloat64(t *testing.T, expected float64, actual float64) {
+	t.Helper()
 	if expected != actual {
 		t.Fatalf(`%s
 		Expected:%v
@@ -90,6 +107,7 @@ func AssertEqualsFloat64(t *testing.T, expected float64, actual float64) {
 }
 
 func AssertEqualsInt(t *testing.T, expected int, actual int) {
+	t.Helper()
 	if expected != actual {
 		t.Fatalf(`%s
 		Expected:%v
@@ -103,6 +121,7 @@ func AssertEqualsInt(t *testing.T, expected int, actual int) {
 }
 
 func AssertEqualsTime(t *testing.T, expected time.Time, actual time.Time) {
+	t.Helper()
 	if expected != actual {
 		t.Fatalf(`%s
 		Expected:%v

@@ -1,10 +1,12 @@
 //go:build !integration
 // +build !integration
 
-package notion
+package notion_test
 
 import (
 	"encoding/json"
+	"github.com/asstart/english-words/app/notion"
+	"github.com/asstart/english-words/app/utils"
 	"testing"
 )
 
@@ -22,17 +24,17 @@ func TestUnmarshalTextCondition(t *testing.T) {
 	}
 	`
 
-	var text TextCondition
+	var text notion.TextCondition
 	json.Unmarshal([]byte(source), &text)
 
-	AssertEqualsString(t, "equals_string", *text.Equals)
-	AssertEqualsString(t, "not_equal_string", *text.DoesntEqual)
-	AssertEqualsString(t, "contains_string", *text.Contains)
-	AssertEqualsString(t, "does_not_contain_string", *text.DoesntContain)
-	AssertEqualsString(t, "starts_with_string", *text.StartsWith)
-	AssertEqualsString(t, "ends_with_string", *text.EndsWith)
-	AssertEqualsBool(t, true, *text.IsEmpty)
-	AssertEqualsBool(t, true, *text.IsNotEmpty)
+	utils.AssertEqualsString(t, "equals_string", *text.Equals)
+	utils.AssertEqualsString(t, "not_equal_string", *text.DoesntEqual)
+	utils.AssertEqualsString(t, "contains_string", *text.Contains)
+	utils.AssertEqualsString(t, "does_not_contain_string", *text.DoesntContain)
+	utils.AssertEqualsString(t, "starts_with_string", *text.StartsWith)
+	utils.AssertEqualsString(t, "ends_with_string", *text.EndsWith)
+	utils.AssertEqualsBool(t, true, *text.IsEmpty)
+	utils.AssertEqualsBool(t, true, *text.IsNotEmpty)
 }
 
 func TestUnmarshalDatabasePage(t *testing.T) {
@@ -276,190 +278,190 @@ func TestUnmarshalDatabasePage(t *testing.T) {
 	  }
 	`
 
-	var pages DatabasePages
+	var pages notion.DatabasePages
 	json.Unmarshal([]byte(source), &pages)
 
-	AssertEqualsBool(t, false, *pages.HasMore)
-	AssertEqualsInt(t, 1, len(pages.Results))
+	utils.AssertEqualsBool(t, false, *pages.HasMore)
+	utils.AssertEqualsInt(t, 1, len(pages.Results))
 	page := pages.Results[0]
-	AssertEqualsString(t, "4f5cb747-e1d5-46a8-9bcd-48df3a21d675", *page.ID)
+	utils.AssertEqualsString(t, "4f5cb747-e1d5-46a8-9bcd-48df3a21d675", *page.ID)
 	// AssertEqualsTime(t, time.)
-	AssertEqualsString(t, "c7f2ae70-6b98-438f-8564-c59a71d7b3a4", *page.CreatedBy.ID)
-	AssertEqualsString(t, "c7f2ae70-6b98-438f-8564-c59a71d7b3a4", *page.LastEditedBy.ID)
-	AssertEqualsString(t, "external", *page.Cover.Type)
-	AssertEqualsString(t, "https://www.notion.so/images/page-cover/rijksmuseum_vermeer_the_milkmaid.jpg", *page.Cover.ExternalFile.URL)
-	AssertEqualsString(t, "emoji", *page.Icon.Type)
-	AssertEqualsString(t, "😁", *page.Icon.Emoji)
-	AssertEqualsString(t, "database_id", *page.Parent.Type)
-	AssertEqualsString(t, "ffd97167-8029-47f8-8623-c2347dd9c563", *page.Parent.DatabaseID)
-	AssertEqualsBool(t, false, *page.Archived)
-	props := page.Properties.(PageProperties)
+	utils.AssertEqualsString(t, "c7f2ae70-6b98-438f-8564-c59a71d7b3a4", *page.CreatedBy.ID)
+	utils.AssertEqualsString(t, "c7f2ae70-6b98-438f-8564-c59a71d7b3a4", *page.LastEditedBy.ID)
+	utils.AssertEqualsString(t, "external", *page.Cover.Type)
+	utils.AssertEqualsString(t, "https://www.notion.so/images/page-cover/rijksmuseum_vermeer_the_milkmaid.jpg", *page.Cover.ExternalFile.URL)
+	utils.AssertEqualsString(t, "emoji", *page.Icon.Type)
+	utils.AssertEqualsString(t, "😁", *page.Icon.Emoji)
+	utils.AssertEqualsString(t, "database_id", *page.Parent.Type)
+	utils.AssertEqualsString(t, "ffd97167-8029-47f8-8623-c2347dd9c563", *page.Parent.DatabaseID)
+	utils.AssertEqualsBool(t, false, *page.Archived)
+	props := page.Properties.(notion.PageProperties)
 	v, ok := props["Property 2"]
-	AssertEqualsBool(t, true, ok)
-	AssertEqualsString(t, "%3A%60gb", *v.ID)
-	AssertEqualsString(t, "date", *v.Type)
-	AssertEqualsString(t, "2022-04-04", *v.Date.Start)
-	AssertNil(t, v.Date.End)
-	AssertNil(t, v.Date.TimeZone)
+	utils.AssertEqualsBool(t, true, ok)
+	utils.AssertEqualsString(t, "%3A%60gb", *v.ID)
+	utils.AssertEqualsString(t, "date", *v.Type)
+	utils.AssertEqualsString(t, "2022-04-04", *v.Date.Start)
+	utils.AssertNil(t, v.Date.End)
+	utils.AssertNil(t, v.Date.TimeZone)
 	v, ok = props["Property 4"]
-	AssertEqualsBool(t, true, ok)
-	AssertEqualsString(t, "files", *v.Type)
-	AssertEqualsInt(t, 1, len(v.Files))
-	AssertEqualsString(t, "2.jpg", *v.Files[0].Name)
-	AssertEqualsString(t, "file", *v.Files[0].Type)
-	AssertEqualsString(
+	utils.AssertEqualsBool(t, true, ok)
+	utils.AssertEqualsString(t, "files", *v.Type)
+	utils.AssertEqualsInt(t, 1, len(v.Files))
+	utils.AssertEqualsString(t, "2.jpg", *v.Files[0].Name)
+	utils.AssertEqualsString(t, "file", *v.Files[0].Type)
+	utils.AssertEqualsString(
 		t,
 		"https://s3.us-west-2.amazonaws.com/secure.notion-static.com/8a85ee6e-dfa5-42b8-8900-9cb92d490d54/2.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAT73L2G45EIPT3X45%2F20220418%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20220418T223419Z&X-Amz-Expires=3600&X-Amz-Signature=326c1cca24e649c1fb2861644212546f26ad2f11b7c4e72426a5d648ad868700&X-Amz-SignedHeaders=host&x-id=GetObject",
 		*v.Files[0].NotionFile.URL)
 	// AssertEqualsTime(t, time.Parse("2022-04-18T23:34:19.557Z"), *v.Files[0].NotionFile.ExpireTime)
 	v, ok = props["Tags"]
-	AssertEqualsBool(t, true, ok)
-	AssertEqualsString(t, "%40Lx%7C", *v.ID)
-	AssertEqualsString(t, "multi_select", *v.Type)
-	AssertEqualsInt(t, 2, len(v.MultiSelect))
-	AssertEqualsString(t, "a0f30ec1-f592-4ec2-a69a-71fbd2eafbf3", *v.MultiSelect[0].ID)
-	AssertEqualsString(t, "word", *v.MultiSelect[0].Name)
-	AssertEqualsString(t, "blue", *v.MultiSelect[0].Color)
-	AssertEqualsString(t, "28d91a14-b38b-4d3c-afa6-738b3864ae0f", *v.MultiSelect[1].ID)
-	AssertEqualsString(t, "drow", *v.MultiSelect[1].Name)
-	AssertEqualsString(t, "purple", *v.MultiSelect[1].Color)
+	utils.AssertEqualsBool(t, true, ok)
+	utils.AssertEqualsString(t, "%40Lx%7C", *v.ID)
+	utils.AssertEqualsString(t, "multi_select", *v.Type)
+	utils.AssertEqualsInt(t, 2, len(v.MultiSelect))
+	utils.AssertEqualsString(t, "a0f30ec1-f592-4ec2-a69a-71fbd2eafbf3", *v.MultiSelect[0].ID)
+	utils.AssertEqualsString(t, "word", *v.MultiSelect[0].Name)
+	utils.AssertEqualsString(t, "blue", *v.MultiSelect[0].Color)
+	utils.AssertEqualsString(t, "28d91a14-b38b-4d3c-afa6-738b3864ae0f", *v.MultiSelect[1].ID)
+	utils.AssertEqualsString(t, "drow", *v.MultiSelect[1].Name)
+	utils.AssertEqualsString(t, "purple", *v.MultiSelect[1].Color)
 	v, ok = props["updated_at"]
-	AssertEqualsBool(t, true, ok)
-	AssertEqualsString(t, "Az%3Cf", *v.ID)
-	AssertEqualsString(t, "last_edited_time", *v.Type)
+	utils.AssertEqualsBool(t, true, ok)
+	utils.AssertEqualsString(t, "Az%3Cf", *v.ID)
+	utils.AssertEqualsString(t, "last_edited_time", *v.Type)
 	// AssertEqualsTime(t, , v.LastEditedTime)
 	v, ok = props["Property 6"]
-	AssertEqualsBool(t, true, ok)
-	AssertEqualsString(t, "KP%7CT", *v.ID)
-	AssertEqualsString(t, "url", *v.Type)
-	AssertEqualsString(t, "https://pkg.go.dev/github.com/asstart/english-words/app/ewords/notion#Filter.Property", *v.URL)
+	utils.AssertEqualsBool(t, true, ok)
+	utils.AssertEqualsString(t, "KP%7CT", *v.ID)
+	utils.AssertEqualsString(t, "url", *v.Type)
+	utils.AssertEqualsString(t, "https://pkg.go.dev/github.com/asstart/english-words/app/ewords/notion#Filter.Property", *v.URL)
 	v, ok = props["Defenition"]
-	AssertEqualsBool(t, true, ok)
-	AssertEqualsString(t, "OIab", *v.ID)
-	AssertEqualsString(t, "rich_text", *v.Type)
-	AssertEqualsInt(t, 0, len(v.RichText))
+	utils.AssertEqualsBool(t, true, ok)
+	utils.AssertEqualsString(t, "OIab", *v.ID)
+	utils.AssertEqualsString(t, "rich_text", *v.Type)
+	utils.AssertEqualsInt(t, 0, len(v.RichText))
 	v, ok = props["Property 13"]
-	AssertEqualsBool(t, true, ok)
-	AssertEqualsString(t, "Rl%3F%3D", *v.ID)
-	AssertEqualsString(t, "last_edited_by", *v.Type)
-	AssertEqualsString(t, "user", *v.LastEditedBy.Object)
-	AssertEqualsString(t, "c7f2ae70-6b98-438f-8564-c59a71d7b3a4", *v.LastEditedBy.ID)
+	utils.AssertEqualsBool(t, true, ok)
+	utils.AssertEqualsString(t, "Rl%3F%3D", *v.ID)
+	utils.AssertEqualsString(t, "last_edited_by", *v.Type)
+	utils.AssertEqualsString(t, "user", *v.LastEditedBy.Object)
+	utils.AssertEqualsString(t, "c7f2ae70-6b98-438f-8564-c59a71d7b3a4", *v.LastEditedBy.ID)
 	v, ok = props["Property"]
-	AssertEqualsBool(t, true, ok)
-	AssertEqualsString(t, "SUv~", *v.ID)
-	AssertEqualsString(t, "number", *v.Type)
-	AssertEqualsInt(t, 1234, int(*v.Number))
+	utils.AssertEqualsBool(t, true, ok)
+	utils.AssertEqualsString(t, "SUv~", *v.ID)
+	utils.AssertEqualsString(t, "number", *v.Type)
+	utils.AssertEqualsInt(t, 1234, int(*v.Number))
 
 	v, ok = props["Transcription"]
-	AssertEqualsBool(t, true, ok)
-	AssertEqualsString(t, "TmLV", *v.ID)
-	AssertEqualsString(t, "rich_text", *v.Type)
-	AssertEqualsInt(t, 1, len(v.RichText))
-	AssertEqualsString(t, "text", *v.RichText[0].Type)
-	AssertEqualsString(t, "hello", *v.RichText[0].Text.Content)
-	AssertNil(t, v.RichText[0].Text.Link)
-	AssertEqualsBool(t, false, *v.RichText[0].Annotations.Bold)
-	AssertEqualsBool(t, false, *v.RichText[0].Annotations.Italic)
-	AssertEqualsBool(t, false, *v.RichText[0].Annotations.Strikethrough)
-	AssertEqualsBool(t, false, *v.RichText[0].Annotations.Underline)
-	AssertEqualsBool(t, false, *v.RichText[0].Annotations.Code)
-	AssertEqualsString(t, "default", *v.RichText[0].Annotations.Color)
-	AssertEqualsString(t, "hello", *v.RichText[0].PlainText)
-	AssertNil(t, v.RichText[0].Href)
+	utils.AssertEqualsBool(t, true, ok)
+	utils.AssertEqualsString(t, "TmLV", *v.ID)
+	utils.AssertEqualsString(t, "rich_text", *v.Type)
+	utils.AssertEqualsInt(t, 1, len(v.RichText))
+	utils.AssertEqualsString(t, "text", *v.RichText[0].Type)
+	utils.AssertEqualsString(t, "hello", *v.RichText[0].Text.Content)
+	utils.AssertNil(t, v.RichText[0].Text.Link)
+	utils.AssertEqualsBool(t, false, *v.RichText[0].Annotations.Bold)
+	utils.AssertEqualsBool(t, false, *v.RichText[0].Annotations.Italic)
+	utils.AssertEqualsBool(t, false, *v.RichText[0].Annotations.Strikethrough)
+	utils.AssertEqualsBool(t, false, *v.RichText[0].Annotations.Underline)
+	utils.AssertEqualsBool(t, false, *v.RichText[0].Annotations.Code)
+	utils.AssertEqualsString(t, "default", *v.RichText[0].Annotations.Color)
+	utils.AssertEqualsString(t, "hello", *v.RichText[0].PlainText)
+	utils.AssertNil(t, v.RichText[0].Href)
 
 	v, ok = props["Property 7"]
-	AssertEqualsBool(t, true, ok)
-	AssertEqualsString(t, "Trvl", *v.ID)
-	AssertEqualsString(t, "email", *v.Type)
-	AssertEqualsString(t, "some@gmail.com", *v.Email)
+	utils.AssertEqualsBool(t, true, ok)
+	utils.AssertEqualsString(t, "Trvl", *v.ID)
+	utils.AssertEqualsString(t, "email", *v.Type)
+	utils.AssertEqualsString(t, "some@gmail.com", *v.Email)
 
 	v, ok = props["Property 3"]
-	AssertEqualsBool(t, true, ok)
-	AssertEqualsString(t, "%5EbRD", *v.ID)
-	AssertEqualsString(t, "people", *v.Type)
-	AssertEqualsInt(t, 1, len(v.People))
-	AssertEqualsString(t, "user", *v.People[0].Object)
-	AssertEqualsString(t, "c7f2ae70-6b98-438f-8564-c59a71d7b3a4", *v.People[0].ID)
+	utils.AssertEqualsBool(t, true, ok)
+	utils.AssertEqualsString(t, "%5EbRD", *v.ID)
+	utils.AssertEqualsString(t, "people", *v.Type)
+	utils.AssertEqualsInt(t, 1, len(v.People))
+	utils.AssertEqualsString(t, "user", *v.People[0].Object)
+	utils.AssertEqualsString(t, "c7f2ae70-6b98-438f-8564-c59a71d7b3a4", *v.People[0].ID)
 
 	v, ok = props["Property 12"]
-	AssertEqualsBool(t, true, ok)
-	AssertEqualsString(t, "_cww", *v.ID)
-	AssertEqualsString(t, "created_by", *v.Type)
-	AssertEqualsString(t, "user", *v.CreatedBy.Object)
-	AssertEqualsString(t, "c7f2ae70-6b98-438f-8564-c59a71d7b3a4", *v.CreatedBy.ID)
+	utils.AssertEqualsBool(t, true, ok)
+	utils.AssertEqualsString(t, "_cww", *v.ID)
+	utils.AssertEqualsString(t, "created_by", *v.Type)
+	utils.AssertEqualsString(t, "user", *v.CreatedBy.Object)
+	utils.AssertEqualsString(t, "c7f2ae70-6b98-438f-8564-c59a71d7b3a4", *v.CreatedBy.ID)
 
 	v, ok = props["Example"]
-	AssertEqualsBool(t, true, ok)
-	AssertEqualsString(t, "cjRY", *v.ID)
-	AssertEqualsString(t, "rich_text", *v.Type)
-	AssertEqualsInt(t, 1, len(v.RichText))
-	AssertEqualsString(t, "text", *v.RichText[0].Type)
-	AssertEqualsString(t, "Hello there", *v.RichText[0].Text.Content)
-	AssertNil(t, v.RichText[0].Text.Link)
-	AssertEqualsBool(t, false, *v.RichText[0].Annotations.Bold)
-	AssertEqualsBool(t, false, *v.RichText[0].Annotations.Italic)
-	AssertEqualsBool(t, false, *v.RichText[0].Annotations.Strikethrough)
-	AssertEqualsBool(t, false, *v.RichText[0].Annotations.Underline)
-	AssertEqualsBool(t, false, *v.RichText[0].Annotations.Code)
-	AssertEqualsString(t, "default", *v.RichText[0].Annotations.Color)
-	AssertEqualsString(t, "Hello there", *v.RichText[0].PlainText)
-	AssertNil(t, v.RichText[0].Href)
+	utils.AssertEqualsBool(t, true, ok)
+	utils.AssertEqualsString(t, "cjRY", *v.ID)
+	utils.AssertEqualsString(t, "rich_text", *v.Type)
+	utils.AssertEqualsInt(t, 1, len(v.RichText))
+	utils.AssertEqualsString(t, "text", *v.RichText[0].Type)
+	utils.AssertEqualsString(t, "Hello there", *v.RichText[0].Text.Content)
+	utils.AssertNil(t, v.RichText[0].Text.Link)
+	utils.AssertEqualsBool(t, false, *v.RichText[0].Annotations.Bold)
+	utils.AssertEqualsBool(t, false, *v.RichText[0].Annotations.Italic)
+	utils.AssertEqualsBool(t, false, *v.RichText[0].Annotations.Strikethrough)
+	utils.AssertEqualsBool(t, false, *v.RichText[0].Annotations.Underline)
+	utils.AssertEqualsBool(t, false, *v.RichText[0].Annotations.Code)
+	utils.AssertEqualsString(t, "default", *v.RichText[0].Annotations.Color)
+	utils.AssertEqualsString(t, "Hello there", *v.RichText[0].PlainText)
+	utils.AssertNil(t, v.RichText[0].Href)
 
 	v, ok = props["handled"]
-	AssertEqualsBool(t, true, ok)
-	AssertEqualsString(t, "il~C", *v.ID)
-	AssertEqualsString(t, "checkbox", *v.Type)
-	AssertEqualsBool(t, true, *v.Checkbox)
+	utils.AssertEqualsBool(t, true, ok)
+	utils.AssertEqualsString(t, "il~C", *v.ID)
+	utils.AssertEqualsString(t, "checkbox", *v.Type)
+	utils.AssertEqualsBool(t, true, *v.Checkbox)
 
 	v, ok = props["Property 5"]
-	AssertEqualsBool(t, true, ok)
-	AssertEqualsString(t, "m~bE", *v.ID)
-	AssertEqualsString(t, "checkbox", *v.Type)
-	AssertEqualsBool(t, false, *v.Checkbox)
+	utils.AssertEqualsBool(t, true, ok)
+	utils.AssertEqualsString(t, "m~bE", *v.ID)
+	utils.AssertEqualsString(t, "checkbox", *v.Type)
+	utils.AssertEqualsBool(t, false, *v.Checkbox)
 
 	v, ok = props["created_at"]
-	AssertEqualsBool(t, true, ok)
-	AssertEqualsString(t, "o~QP", *v.ID)
-	AssertEqualsString(t, "created_time", *v.Type)
+	utils.AssertEqualsBool(t, true, ok)
+	utils.AssertEqualsString(t, "o~QP", *v.ID)
+	utils.AssertEqualsString(t, "created_time", *v.Type)
 	//TODO check time
 
 	v, ok = props["Property 9"]
-	AssertEqualsBool(t, true, ok)
-	AssertEqualsString(t, "u%3Bcf", *v.ID)
-	AssertEqualsString(t, "formula", *v.Type)
-	AssertEqualsString(t, "boolean", *v.Formula.Type)
-	AssertEqualsBool(t, false, *v.Formula.BooleanFormula)
+	utils.AssertEqualsBool(t, true, ok)
+	utils.AssertEqualsString(t, "u%3Bcf", *v.ID)
+	utils.AssertEqualsString(t, "formula", *v.Type)
+	utils.AssertEqualsString(t, "boolean", *v.Formula.Type)
+	utils.AssertEqualsBool(t, false, *v.Formula.BooleanFormula)
 
 	v, ok = props["Property 8"]
-	AssertEqualsBool(t, true, ok)
-	AssertEqualsString(t, "z%5D%3AD", *v.ID)
-	AssertEqualsString(t, "phone_number", *v.Type)
-	AssertEqualsString(t, "+79998887766", *v.PhoneNumber)
+	utils.AssertEqualsBool(t, true, ok)
+	utils.AssertEqualsString(t, "z%5D%3AD", *v.ID)
+	utils.AssertEqualsString(t, "phone_number", *v.Type)
+	utils.AssertEqualsString(t, "+79998887766", *v.PhoneNumber)
 
 	v, ok = props["Word"]
-	AssertEqualsBool(t, true, ok)
-	AssertEqualsString(t, "title", *v.ID)
-	AssertEqualsString(t, "title", *v.Type)
-	AssertEqualsInt(t, 1, len(v.Title))
-	AssertEqualsString(t, "text", *v.Title[0].Type)
-	AssertEqualsString(t, "Hello", *v.Title[0].Text.Content)
-	AssertNil(t, v.Title[0].Text.Link)
-	AssertEqualsBool(t, false, *v.Title[0].Annotations.Bold)
-	AssertEqualsBool(t, false, *v.Title[0].Annotations.Italic)
-	AssertEqualsBool(t, false, *v.Title[0].Annotations.Strikethrough)
-	AssertEqualsBool(t, false, *v.Title[0].Annotations.Underline)
-	AssertEqualsBool(t, false, *v.Title[0].Annotations.Code)
-	AssertEqualsString(t, "default", *v.Title[0].Annotations.Color)
-	AssertEqualsString(t, "Hello", *v.Title[0].PlainText)
-	AssertNil(t, v.Title[0].Href)
+	utils.AssertEqualsBool(t, true, ok)
+	utils.AssertEqualsString(t, "title", *v.ID)
+	utils.AssertEqualsString(t, "title", *v.Type)
+	utils.AssertEqualsInt(t, 1, len(v.Title))
+	utils.AssertEqualsString(t, "text", *v.Title[0].Type)
+	utils.AssertEqualsString(t, "Hello", *v.Title[0].Text.Content)
+	utils.AssertNil(t, v.Title[0].Text.Link)
+	utils.AssertEqualsBool(t, false, *v.Title[0].Annotations.Bold)
+	utils.AssertEqualsBool(t, false, *v.Title[0].Annotations.Italic)
+	utils.AssertEqualsBool(t, false, *v.Title[0].Annotations.Strikethrough)
+	utils.AssertEqualsBool(t, false, *v.Title[0].Annotations.Underline)
+	utils.AssertEqualsBool(t, false, *v.Title[0].Annotations.Code)
+	utils.AssertEqualsString(t, "default", *v.Title[0].Annotations.Color)
+	utils.AssertEqualsString(t, "Hello", *v.Title[0].PlainText)
+	utils.AssertNil(t, v.Title[0].Href)
 }
 
 func TestMarshalRichTextContainsFilter(t *testing.T) {
-	var f = Filter{
-		Property: StrPtr("Landmark"),
-		RichText: &TextCondition{
+	var f = notion.Filter{
+		Property: utils.StrPtr("Landmark"),
+		RichText: &notion.TextCondition{
 
-			Contains: StrPtr("Bridge"),
+			Contains: utils.StrPtr("Bridge"),
 		},
 	}
 
@@ -474,22 +476,22 @@ func TestMarshalRichTextContainsFilter(t *testing.T) {
 
 	marshaled, _ := json.Marshal(f)
 
-	AssertEqualsString(t, Minimise(expected), Minimise(string(marshaled)))
+	utils.AssertEqualsString(t, utils.Minimise(expected), utils.Minimise(string(marshaled)))
 }
 
 func TestMarshalCompoundFilter(t *testing.T) {
-	var f = Filter{
-		And: []Filter{
-			Filter{
-				Property: StrPtr("Seen"),
-				CheckBox: &CheckboxCondition{
-					Equals: BoolPtr(false),
+	var f = notion.Filter{
+		And: []notion.Filter{
+			notion.Filter{
+				Property: utils.StrPtr("Seen"),
+				CheckBox: &notion.CheckboxCondition{
+					Equals: utils.BoolPtr(false),
 				},
 			},
-			Filter{
-				Property: StrPtr("Yearly visitor count"),
-				Number: &NumberCondition{
-					GreaterThan: FloatPtr(1000000),
+			notion.Filter{
+				Property: utils.StrPtr("Yearly visitor count"),
+				Number: &notion.NumberCondition{
+					GreaterThan: utils.FloatPtr(1000000),
 				},
 			},
 		},
@@ -516,30 +518,30 @@ func TestMarshalCompoundFilter(t *testing.T) {
 
 	marshaled, _ := json.Marshal(f)
 
-	AssertEqualsString(t, Minimise(expected), Minimise(string(marshaled)))
+	utils.AssertEqualsString(t, utils.Minimise(expected), utils.Minimise(string(marshaled)))
 }
 
 func TestMarshalMiltililevelCompoundFilter(t *testing.T) {
-	var f = Filter{
-		Or: []Filter{
-			Filter{
-				Property: StrPtr("Description"),
-				RichText: &TextCondition{
-					Contains: StrPtr("fish"),
+	var f = notion.Filter{
+		Or: []notion.Filter{
+			notion.Filter{
+				Property: utils.StrPtr("Description"),
+				RichText: &notion.TextCondition{
+					Contains: utils.StrPtr("fish"),
 				},
 			},
-			Filter{
-				And: []Filter{
-					Filter{
-						Property: StrPtr("Food group"),
-						Select: &SelectCondition{
-							Equals: StrPtr("🥦Vegetable"),
+			notion.Filter{
+				And: []notion.Filter{
+					notion.Filter{
+						Property: utils.StrPtr("Food group"),
+						Select: &notion.SelectCondition{
+							Equals: utils.StrPtr("🥦Vegetable"),
 						},
 					},
-					Filter{
-						Property: StrPtr("Is protein rich?"),
-						CheckBox: &CheckboxCondition{
-							Equals: BoolPtr(true),
+					notion.Filter{
+						Property: utils.StrPtr("Is protein rich?"),
+						CheckBox: &notion.CheckboxCondition{
+							Equals: utils.BoolPtr(true),
 						},
 					},
 				},
@@ -578,13 +580,13 @@ func TestMarshalMiltililevelCompoundFilter(t *testing.T) {
 
 	marshaled, _ := json.Marshal(f)
 
-	AssertEqualsString(t, Minimise(expected), Minimise(string(marshaled)))
+	utils.AssertEqualsString(t, utils.Minimise(expected), utils.Minimise(string(marshaled)))
 }
 
 func TestSortMarshal(t *testing.T) {
-	s := Sort{
-		Property:  StrPtr("Food group"),
-		Direction: StrPtr("descending"),
+	s := notion.Sort{
+		Property:  utils.StrPtr("Food group"),
+		Direction: utils.StrPtr("descending"),
 	}
 
 	expected := `
@@ -596,30 +598,30 @@ func TestSortMarshal(t *testing.T) {
 
 	marshaled, _ := json.Marshal(s)
 
-	AssertEqualsString(t, Minimise(expected), Minimise(string(marshaled)))
+	utils.AssertEqualsString(t, utils.Minimise(expected), utils.Minimise(string(marshaled)))
 }
 
 func TestDatabaseQuery(t *testing.T) {
-	query := DatabaseQuery{
-		Filter: &Filter{
-			Property: StrPtr("Landmark"),
-			RichText: &TextCondition{
+	query := notion.DatabaseQuery{
+		Filter: &notion.Filter{
+			Property: utils.StrPtr("Landmark"),
+			RichText: &notion.TextCondition{
 
-				Contains: StrPtr("Bridge"),
+				Contains: utils.StrPtr("Bridge"),
 			},
 		},
-		Sorts: []Sort{
-			Sort{
-				Property:  StrPtr("Food group"),
-				Direction: StrPtr("descending"),
+		Sorts: []notion.Sort{
+			notion.Sort{
+				Property:  utils.StrPtr("Food group"),
+				Direction: utils.StrPtr("descending"),
 			},
-			Sort{
-				Property:  StrPtr("Name"),
-				Direction: StrPtr("ascending"),
+			notion.Sort{
+				Property:  utils.StrPtr("Name"),
+				Direction: utils.StrPtr("ascending"),
 			},
 		},
-		StartCursor: StrPtr("3-295-0235"),
-		PageSize:    IntPtr(50),
+		StartCursor: utils.StrPtr("3-295-0235"),
+		PageSize:    utils.IntPtr(50),
 	}
 
 	marshaled, _ := json.Marshal(query)
@@ -647,14 +649,14 @@ func TestDatabaseQuery(t *testing.T) {
 	}
 	`
 
-	AssertEqualsString(t, Minimise(expected), Minimise(string(marshaled)))
+	utils.AssertEqualsString(t, utils.Minimise(expected), utils.Minimise(string(marshaled)))
 }
 
 func TestUpdatePage(t *testing.T) {
-	up := UpdatePage{
-		Properties: PageProperties{
-			"handled": PageProperty{
-				Checkbox: BoolPtr(true),
+	up := notion.UpdatePage{
+		Properties: notion.PageProperties{
+			"handled": notion.PageProperty{
+				Checkbox: utils.BoolPtr(true),
 			},
 		},
 	}
@@ -673,7 +675,7 @@ func TestUpdatePage(t *testing.T) {
 
 	marshaled, _ := json.Marshal(up)
 
-	AssertEqualsString(t, Minimise(expected), Minimise(string(marshaled)))
+	utils.AssertEqualsString(t, utils.Minimise(expected), utils.Minimise(string(marshaled)))
 }
 
 func TestUnmarshalPage(t *testing.T) {
@@ -898,166 +900,166 @@ func TestUnmarshalPage(t *testing.T) {
 	  }
 	`
 
-	var page Page
+	var page notion.Page
 	json.Unmarshal([]byte(jsn), &page)
 
-	AssertEqualsString(t, "4f5cb747-e1d5-46a8-9bcd-48df3a21d675", *page.ID)
+	utils.AssertEqualsString(t, "4f5cb747-e1d5-46a8-9bcd-48df3a21d675", *page.ID)
 	// AssertEqualsTime(t, time.)
-	AssertEqualsString(t, "c7f2ae70-6b98-438f-8564-c59a71d7b3a4", *page.CreatedBy.ID)
-	AssertEqualsString(t, "61b898c0-7772-48d5-886e-2a222669737c", *page.LastEditedBy.ID)
-	AssertEqualsString(t, "external", *page.Cover.Type)
-	AssertEqualsString(t, "https://www.notion.so/images/page-cover/rijksmuseum_vermeer_the_milkmaid.jpg", *page.Cover.ExternalFile.URL)
-	AssertEqualsString(t, "emoji", *page.Icon.Type)
-	AssertEqualsString(t, "😁", *page.Icon.Emoji)
-	AssertEqualsString(t, "database_id", *page.Parent.Type)
-	AssertEqualsString(t, "ffd97167-8029-47f8-8623-c2347dd9c563", *page.Parent.DatabaseID)
-	AssertEqualsBool(t, false, *page.Archived)
-	props := page.Properties.(PageProperties)
+	utils.AssertEqualsString(t, "c7f2ae70-6b98-438f-8564-c59a71d7b3a4", *page.CreatedBy.ID)
+	utils.AssertEqualsString(t, "61b898c0-7772-48d5-886e-2a222669737c", *page.LastEditedBy.ID)
+	utils.AssertEqualsString(t, "external", *page.Cover.Type)
+	utils.AssertEqualsString(t, "https://www.notion.so/images/page-cover/rijksmuseum_vermeer_the_milkmaid.jpg", *page.Cover.ExternalFile.URL)
+	utils.AssertEqualsString(t, "emoji", *page.Icon.Type)
+	utils.AssertEqualsString(t, "😁", *page.Icon.Emoji)
+	utils.AssertEqualsString(t, "database_id", *page.Parent.Type)
+	utils.AssertEqualsString(t, "ffd97167-8029-47f8-8623-c2347dd9c563", *page.Parent.DatabaseID)
+	utils.AssertEqualsBool(t, false, *page.Archived)
+	props := page.Properties.(notion.PageProperties)
 	v, ok := props["Property 2"]
-	AssertEqualsBool(t, true, ok)
-	AssertEqualsString(t, "%3A%60gb", *v.ID)
-	AssertEqualsString(t, "date", *v.Type)
-	AssertEqualsString(t, "2022-04-04", *v.Date.Start)
-	AssertNil(t, v.Date.End)
-	AssertNil(t, v.Date.TimeZone)
+	utils.AssertEqualsBool(t, true, ok)
+	utils.AssertEqualsString(t, "%3A%60gb", *v.ID)
+	utils.AssertEqualsString(t, "date", *v.Type)
+	utils.AssertEqualsString(t, "2022-04-04", *v.Date.Start)
+	utils.AssertNil(t, v.Date.End)
+	utils.AssertNil(t, v.Date.TimeZone)
 	v, ok = props["Tags"]
-	AssertEqualsBool(t, true, ok)
-	AssertEqualsString(t, "%40Lx%7C", *v.ID)
-	AssertEqualsString(t, "multi_select", *v.Type)
-	AssertEqualsInt(t, 2, len(v.MultiSelect))
-	AssertEqualsString(t, "a0f30ec1-f592-4ec2-a69a-71fbd2eafbf3", *v.MultiSelect[0].ID)
-	AssertEqualsString(t, "word", *v.MultiSelect[0].Name)
-	AssertEqualsString(t, "blue", *v.MultiSelect[0].Color)
-	AssertEqualsString(t, "28d91a14-b38b-4d3c-afa6-738b3864ae0f", *v.MultiSelect[1].ID)
-	AssertEqualsString(t, "drow", *v.MultiSelect[1].Name)
-	AssertEqualsString(t, "purple", *v.MultiSelect[1].Color)
+	utils.AssertEqualsBool(t, true, ok)
+	utils.AssertEqualsString(t, "%40Lx%7C", *v.ID)
+	utils.AssertEqualsString(t, "multi_select", *v.Type)
+	utils.AssertEqualsInt(t, 2, len(v.MultiSelect))
+	utils.AssertEqualsString(t, "a0f30ec1-f592-4ec2-a69a-71fbd2eafbf3", *v.MultiSelect[0].ID)
+	utils.AssertEqualsString(t, "word", *v.MultiSelect[0].Name)
+	utils.AssertEqualsString(t, "blue", *v.MultiSelect[0].Color)
+	utils.AssertEqualsString(t, "28d91a14-b38b-4d3c-afa6-738b3864ae0f", *v.MultiSelect[1].ID)
+	utils.AssertEqualsString(t, "drow", *v.MultiSelect[1].Name)
+	utils.AssertEqualsString(t, "purple", *v.MultiSelect[1].Color)
 	v, ok = props["updated_at"]
-	AssertEqualsBool(t, true, ok)
-	AssertEqualsString(t, "Az%3Cf", *v.ID)
-	AssertEqualsString(t, "last_edited_time", *v.Type)
+	utils.AssertEqualsBool(t, true, ok)
+	utils.AssertEqualsString(t, "Az%3Cf", *v.ID)
+	utils.AssertEqualsString(t, "last_edited_time", *v.Type)
 	// AssertEqualsTime(t, , v.LastEditedTime)
 	v, ok = props["Property 6"]
-	AssertEqualsBool(t, true, ok)
-	AssertEqualsString(t, "KP%7CT", *v.ID)
-	AssertEqualsString(t, "url", *v.Type)
-	AssertEqualsString(t, "https://pkg.go.dev/github.com/asstart/english-words/app/ewords/notion#Filter.Property", *v.URL)
+	utils.AssertEqualsBool(t, true, ok)
+	utils.AssertEqualsString(t, "KP%7CT", *v.ID)
+	utils.AssertEqualsString(t, "url", *v.Type)
+	utils.AssertEqualsString(t, "https://pkg.go.dev/github.com/asstart/english-words/app/ewords/notion#Filter.Property", *v.URL)
 	v, ok = props["Defenition"]
-	AssertEqualsBool(t, true, ok)
-	AssertEqualsString(t, "OIab", *v.ID)
-	AssertEqualsString(t, "rich_text", *v.Type)
-	AssertEqualsInt(t, 0, len(v.RichText))
+	utils.AssertEqualsBool(t, true, ok)
+	utils.AssertEqualsString(t, "OIab", *v.ID)
+	utils.AssertEqualsString(t, "rich_text", *v.Type)
+	utils.AssertEqualsInt(t, 0, len(v.RichText))
 	v, ok = props["Property 13"]
-	AssertEqualsBool(t, true, ok)
-	AssertEqualsString(t, "Rl%3F%3D", *v.ID)
-	AssertEqualsString(t, "last_edited_by", *v.Type)
-	AssertEqualsString(t, "user", *v.LastEditedBy.Object)
-	AssertEqualsString(t, "61b898c0-7772-48d5-886e-2a222669737c", *v.LastEditedBy.ID)
+	utils.AssertEqualsBool(t, true, ok)
+	utils.AssertEqualsString(t, "Rl%3F%3D", *v.ID)
+	utils.AssertEqualsString(t, "last_edited_by", *v.Type)
+	utils.AssertEqualsString(t, "user", *v.LastEditedBy.Object)
+	utils.AssertEqualsString(t, "61b898c0-7772-48d5-886e-2a222669737c", *v.LastEditedBy.ID)
 	v, ok = props["Property"]
-	AssertEqualsBool(t, true, ok)
-	AssertEqualsString(t, "SUv~", *v.ID)
-	AssertEqualsString(t, "number", *v.Type)
-	AssertEqualsInt(t, 1234, int(*v.Number))
+	utils.AssertEqualsBool(t, true, ok)
+	utils.AssertEqualsString(t, "SUv~", *v.ID)
+	utils.AssertEqualsString(t, "number", *v.Type)
+	utils.AssertEqualsInt(t, 1234, int(*v.Number))
 
 	v, ok = props["Transcription"]
-	AssertEqualsBool(t, true, ok)
-	AssertEqualsString(t, "TmLV", *v.ID)
-	AssertEqualsString(t, "rich_text", *v.Type)
-	AssertEqualsInt(t, 1, len(v.RichText))
-	AssertEqualsString(t, "text", *v.RichText[0].Type)
-	AssertEqualsString(t, "hello", *v.RichText[0].Text.Content)
-	AssertNil(t, v.RichText[0].Text.Link)
-	AssertEqualsBool(t, false, *v.RichText[0].Annotations.Bold)
-	AssertEqualsBool(t, false, *v.RichText[0].Annotations.Italic)
-	AssertEqualsBool(t, false, *v.RichText[0].Annotations.Strikethrough)
-	AssertEqualsBool(t, false, *v.RichText[0].Annotations.Underline)
-	AssertEqualsBool(t, false, *v.RichText[0].Annotations.Code)
-	AssertEqualsString(t, "default", *v.RichText[0].Annotations.Color)
-	AssertEqualsString(t, "hello", *v.RichText[0].PlainText)
-	AssertNil(t, v.RichText[0].Href)
+	utils.AssertEqualsBool(t, true, ok)
+	utils.AssertEqualsString(t, "TmLV", *v.ID)
+	utils.AssertEqualsString(t, "rich_text", *v.Type)
+	utils.AssertEqualsInt(t, 1, len(v.RichText))
+	utils.AssertEqualsString(t, "text", *v.RichText[0].Type)
+	utils.AssertEqualsString(t, "hello", *v.RichText[0].Text.Content)
+	utils.AssertNil(t, v.RichText[0].Text.Link)
+	utils.AssertEqualsBool(t, false, *v.RichText[0].Annotations.Bold)
+	utils.AssertEqualsBool(t, false, *v.RichText[0].Annotations.Italic)
+	utils.AssertEqualsBool(t, false, *v.RichText[0].Annotations.Strikethrough)
+	utils.AssertEqualsBool(t, false, *v.RichText[0].Annotations.Underline)
+	utils.AssertEqualsBool(t, false, *v.RichText[0].Annotations.Code)
+	utils.AssertEqualsString(t, "default", *v.RichText[0].Annotations.Color)
+	utils.AssertEqualsString(t, "hello", *v.RichText[0].PlainText)
+	utils.AssertNil(t, v.RichText[0].Href)
 
 	v, ok = props["Property 7"]
-	AssertEqualsBool(t, true, ok)
-	AssertEqualsString(t, "Trvl", *v.ID)
-	AssertEqualsString(t, "email", *v.Type)
-	AssertEqualsString(t, "some@gmail.com", *v.Email)
+	utils.AssertEqualsBool(t, true, ok)
+	utils.AssertEqualsString(t, "Trvl", *v.ID)
+	utils.AssertEqualsString(t, "email", *v.Type)
+	utils.AssertEqualsString(t, "some@gmail.com", *v.Email)
 
 	v, ok = props["Property 3"]
-	AssertEqualsBool(t, true, ok)
-	AssertEqualsString(t, "%5EbRD", *v.ID)
-	AssertEqualsString(t, "people", *v.Type)
-	AssertEqualsInt(t, 1, len(v.People))
-	AssertEqualsString(t, "user", *v.People[0].Object)
-	AssertEqualsString(t, "c7f2ae70-6b98-438f-8564-c59a71d7b3a4", *v.People[0].ID)
+	utils.AssertEqualsBool(t, true, ok)
+	utils.AssertEqualsString(t, "%5EbRD", *v.ID)
+	utils.AssertEqualsString(t, "people", *v.Type)
+	utils.AssertEqualsInt(t, 1, len(v.People))
+	utils.AssertEqualsString(t, "user", *v.People[0].Object)
+	utils.AssertEqualsString(t, "c7f2ae70-6b98-438f-8564-c59a71d7b3a4", *v.People[0].ID)
 
 	v, ok = props["Property 12"]
-	AssertEqualsBool(t, true, ok)
-	AssertEqualsString(t, "_cww", *v.ID)
-	AssertEqualsString(t, "created_by", *v.Type)
-	AssertEqualsString(t, "user", *v.CreatedBy.Object)
-	AssertEqualsString(t, "c7f2ae70-6b98-438f-8564-c59a71d7b3a4", *v.CreatedBy.ID)
+	utils.AssertEqualsBool(t, true, ok)
+	utils.AssertEqualsString(t, "_cww", *v.ID)
+	utils.AssertEqualsString(t, "created_by", *v.Type)
+	utils.AssertEqualsString(t, "user", *v.CreatedBy.Object)
+	utils.AssertEqualsString(t, "c7f2ae70-6b98-438f-8564-c59a71d7b3a4", *v.CreatedBy.ID)
 
 	v, ok = props["Example"]
-	AssertEqualsBool(t, true, ok)
-	AssertEqualsString(t, "cjRY", *v.ID)
-	AssertEqualsString(t, "rich_text", *v.Type)
-	AssertEqualsInt(t, 1, len(v.RichText))
-	AssertEqualsString(t, "text", *v.RichText[0].Type)
-	AssertEqualsString(t, "Hello there", *v.RichText[0].Text.Content)
-	AssertNil(t, v.RichText[0].Text.Link)
-	AssertEqualsBool(t, false, *v.RichText[0].Annotations.Bold)
-	AssertEqualsBool(t, false, *v.RichText[0].Annotations.Italic)
-	AssertEqualsBool(t, false, *v.RichText[0].Annotations.Strikethrough)
-	AssertEqualsBool(t, false, *v.RichText[0].Annotations.Underline)
-	AssertEqualsBool(t, false, *v.RichText[0].Annotations.Code)
-	AssertEqualsString(t, "default", *v.RichText[0].Annotations.Color)
-	AssertEqualsString(t, "Hello there", *v.RichText[0].PlainText)
-	AssertNil(t, v.RichText[0].Href)
+	utils.AssertEqualsBool(t, true, ok)
+	utils.AssertEqualsString(t, "cjRY", *v.ID)
+	utils.AssertEqualsString(t, "rich_text", *v.Type)
+	utils.AssertEqualsInt(t, 1, len(v.RichText))
+	utils.AssertEqualsString(t, "text", *v.RichText[0].Type)
+	utils.AssertEqualsString(t, "Hello there", *v.RichText[0].Text.Content)
+	utils.AssertNil(t, v.RichText[0].Text.Link)
+	utils.AssertEqualsBool(t, false, *v.RichText[0].Annotations.Bold)
+	utils.AssertEqualsBool(t, false, *v.RichText[0].Annotations.Italic)
+	utils.AssertEqualsBool(t, false, *v.RichText[0].Annotations.Strikethrough)
+	utils.AssertEqualsBool(t, false, *v.RichText[0].Annotations.Underline)
+	utils.AssertEqualsBool(t, false, *v.RichText[0].Annotations.Code)
+	utils.AssertEqualsString(t, "default", *v.RichText[0].Annotations.Color)
+	utils.AssertEqualsString(t, "Hello there", *v.RichText[0].PlainText)
+	utils.AssertNil(t, v.RichText[0].Href)
 
 	v, ok = props["handled"]
-	AssertEqualsBool(t, true, ok)
-	AssertEqualsString(t, "il~C", *v.ID)
-	AssertEqualsString(t, "checkbox", *v.Type)
-	AssertEqualsBool(t, true, *v.Checkbox)
+	utils.AssertEqualsBool(t, true, ok)
+	utils.AssertEqualsString(t, "il~C", *v.ID)
+	utils.AssertEqualsString(t, "checkbox", *v.Type)
+	utils.AssertEqualsBool(t, true, *v.Checkbox)
 
 	v, ok = props["Property 5"]
-	AssertEqualsBool(t, true, ok)
-	AssertEqualsString(t, "m~bE", *v.ID)
-	AssertEqualsString(t, "checkbox", *v.Type)
-	AssertEqualsBool(t, false, *v.Checkbox)
+	utils.AssertEqualsBool(t, true, ok)
+	utils.AssertEqualsString(t, "m~bE", *v.ID)
+	utils.AssertEqualsString(t, "checkbox", *v.Type)
+	utils.AssertEqualsBool(t, false, *v.Checkbox)
 
 	v, ok = props["created_at"]
-	AssertEqualsBool(t, true, ok)
-	AssertEqualsString(t, "o~QP", *v.ID)
-	AssertEqualsString(t, "created_time", *v.Type)
+	utils.AssertEqualsBool(t, true, ok)
+	utils.AssertEqualsString(t, "o~QP", *v.ID)
+	utils.AssertEqualsString(t, "created_time", *v.Type)
 	//TODO check time
 
 	v, ok = props["Property 9"]
-	AssertEqualsBool(t, true, ok)
-	AssertEqualsString(t, "u%3Bcf", *v.ID)
-	AssertEqualsString(t, "formula", *v.Type)
-	AssertEqualsString(t, "boolean", *v.Formula.Type)
-	AssertEqualsBool(t, false, *v.Formula.BooleanFormula)
+	utils.AssertEqualsBool(t, true, ok)
+	utils.AssertEqualsString(t, "u%3Bcf", *v.ID)
+	utils.AssertEqualsString(t, "formula", *v.Type)
+	utils.AssertEqualsString(t, "boolean", *v.Formula.Type)
+	utils.AssertEqualsBool(t, false, *v.Formula.BooleanFormula)
 
 	v, ok = props["Property 8"]
-	AssertEqualsBool(t, true, ok)
-	AssertEqualsString(t, "z%5D%3AD", *v.ID)
-	AssertEqualsString(t, "phone_number", *v.Type)
-	AssertEqualsString(t, "+79998887766", *v.PhoneNumber)
+	utils.AssertEqualsBool(t, true, ok)
+	utils.AssertEqualsString(t, "z%5D%3AD", *v.ID)
+	utils.AssertEqualsString(t, "phone_number", *v.Type)
+	utils.AssertEqualsString(t, "+79998887766", *v.PhoneNumber)
 
 	v, ok = props["Word"]
-	AssertEqualsBool(t, true, ok)
-	AssertEqualsString(t, "title", *v.ID)
-	AssertEqualsString(t, "title", *v.Type)
-	AssertEqualsInt(t, 1, len(v.Title))
-	AssertEqualsString(t, "text", *v.Title[0].Type)
-	AssertEqualsString(t, "Hello", *v.Title[0].Text.Content)
-	AssertNil(t, v.Title[0].Text.Link)
-	AssertEqualsBool(t, false, *v.Title[0].Annotations.Bold)
-	AssertEqualsBool(t, false, *v.Title[0].Annotations.Italic)
-	AssertEqualsBool(t, false, *v.Title[0].Annotations.Strikethrough)
-	AssertEqualsBool(t, false, *v.Title[0].Annotations.Underline)
-	AssertEqualsBool(t, false, *v.Title[0].Annotations.Code)
-	AssertEqualsString(t, "default", *v.Title[0].Annotations.Color)
-	AssertEqualsString(t, "Hello", *v.Title[0].PlainText)
-	AssertNil(t, v.Title[0].Href)
+	utils.AssertEqualsBool(t, true, ok)
+	utils.AssertEqualsString(t, "title", *v.ID)
+	utils.AssertEqualsString(t, "title", *v.Type)
+	utils.AssertEqualsInt(t, 1, len(v.Title))
+	utils.AssertEqualsString(t, "text", *v.Title[0].Type)
+	utils.AssertEqualsString(t, "Hello", *v.Title[0].Text.Content)
+	utils.AssertNil(t, v.Title[0].Text.Link)
+	utils.AssertEqualsBool(t, false, *v.Title[0].Annotations.Bold)
+	utils.AssertEqualsBool(t, false, *v.Title[0].Annotations.Italic)
+	utils.AssertEqualsBool(t, false, *v.Title[0].Annotations.Strikethrough)
+	utils.AssertEqualsBool(t, false, *v.Title[0].Annotations.Underline)
+	utils.AssertEqualsBool(t, false, *v.Title[0].Annotations.Code)
+	utils.AssertEqualsString(t, "default", *v.Title[0].Annotations.Color)
+	utils.AssertEqualsString(t, "Hello", *v.Title[0].PlainText)
+	utils.AssertNil(t, v.Title[0].Href)
 }
