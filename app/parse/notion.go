@@ -111,17 +111,15 @@ func compose(errors ...error) error {
 }
 
 func extractTextProperty(p notion.Page, property string) (string, error) {
-	text, ok := p.Properties.(notion.PageProperties)[property]
+	rt, ok := p.Properties.(notion.PageProperties)[property]
 	if !ok {
 		return "", fmt.Errorf("property: %v not found in page: %v", property, p)
 	}
-	if len(text.RichText) > 1 {
-		return "", fmt.Errorf("property: %v is ambigious: %v", property, text.RichText)
+	var text strings.Builder
+	for _, t := range rt.RichText {
+		text.WriteString(*t.PlainText)
 	}
-	if len(text.RichText) == 0 {
-		return "", nil
-	}
-	return *text.RichText[0].PlainText, nil
+	return text.String(), nil
 }
 
 func extractTitleProperty(p notion.Page, property string) (string, error) {
@@ -129,10 +127,11 @@ func extractTitleProperty(p notion.Page, property string) (string, error) {
 	if !ok {
 		return "", fmt.Errorf("property: %v not found in page: %v", property, p)
 	}
-	if len(title.Title) != 1 {
-		return "", fmt.Errorf("property: %v is ambigious: %v", property, title.Title)
+	var text strings.Builder
+	for _, t := range title.Title {
+		text.WriteString(*t.PlainText)
 	}
-	return *title.Title[0].PlainText, nil
+	return text.String(), nil
 }
 
 func (np *NotionParser) markHandled(pages []notion.Page) error {

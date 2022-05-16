@@ -18,6 +18,7 @@ type UpdatePage struct {
 	Cover      *string        `json:"cover,omitempty"`
 }
 
+//TODO object property
 type Page struct {
 	ID             *string     `json:"id"`
 	CreatedTime    *time.Time  `json:"created_time"`

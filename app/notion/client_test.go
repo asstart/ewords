@@ -23,7 +23,7 @@ func TestQueryDatabase(t *testing.T) {
 	}
 	utils.AssertEqualsInt(t, 1, len(resp.Results))
 	page := resp.Results[0]
-	utils.AssertEqualsString(t, "0d7a66fd-bf30-49e5-a397-37721038b0d5", *page.ID)
+	utils.AssertEqualsString(t, "8cb8ae71-33b5-4802-a3ed-be7dec66b25c", *page.ID)
 	utils.AssertEqualsString(t, "c7f2ae70-6b98-438f-8564-c59a71d7b3a4", *page.CreatedBy.ID)
 	utils.AssertEqualsString(t, "c7f2ae70-6b98-438f-8564-c59a71d7b3a4", *page.LastEditedBy.ID)
 	utils.AssertEqualsString(t, "database_id", *page.Parent.Type)

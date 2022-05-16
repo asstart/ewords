@@ -1,6 +1,8 @@
 package utils
 
 import (
+	"encoding/json"
+	"fmt"
 	"reflect"
 	"regexp"
 	"strings"
@@ -29,6 +31,14 @@ func IntPtr(f int) *int {
 	return &f
 }
 
+func prettyPrint(data interface{}) string {
+	res, err := json.Marshal(data)
+	if err != nil {
+		return fmt.Sprintf("can't encode, raw data: %v", data)
+	}
+	return fmt.Sprintf("%v", string(res))
+}
+
 //TODO Need to make more clever solution for minimizing, at least in which spaces inside quotes won't be removed
 func Minimise(jsn string) string {
 	re, _ := regexp.Compile(`[\s\n]`)
@@ -40,11 +50,14 @@ func AssertNil(t *testing.T, actual interface{}) {
 	if actual == nil ||
 		((reflect.ValueOf(actual).Kind() == reflect.Ptr ||
 			reflect.ValueOf(actual).Kind() == reflect.Map ||
-			reflect.ValueOf(actual).Kind() == reflect.Slice) &&
-			reflect.ValueOf(actual).IsNil()) {
+			reflect.ValueOf(actual).Kind() == reflect.Slice ||
+			reflect.ValueOf(actual).Kind() == reflect.Chan ||
+			reflect.ValueOf(actual).Kind() == reflect.Func ||
+			reflect.ValueOf(actual).Kind() == reflect.UnsafePointer ||
+			reflect.ValueOf(actual).Kind() == reflect.Interface) && reflect.ValueOf(actual).IsNil()) {
 		t.Logf(`%s Value is nill`, success)
 	} else {
-		t.Fatalf(`%s Expected nil value, but: %v`, failed, actual)
+		t.Fatalf(`%s Expected nil value, but: %v`, failed, prettyPrint(actual))
 	}
 }
 
@@ -52,10 +65,14 @@ func AssertNotNill(t *testing.T, actual interface{}) {
 	t.Helper()
 	if (reflect.ValueOf(actual).Kind() == reflect.Ptr ||
 		reflect.ValueOf(actual).Kind() == reflect.Map ||
-		reflect.ValueOf(actual).Kind() == reflect.Slice) && !reflect.ValueOf(actual).IsNil() {
-		t.Logf(`%s %v - Not nill`, success, actual)
+		reflect.ValueOf(actual).Kind() == reflect.Slice ||
+		reflect.ValueOf(actual).Kind() == reflect.Chan ||
+		reflect.ValueOf(actual).Kind() == reflect.Func ||
+		reflect.ValueOf(actual).Kind() == reflect.UnsafePointer ||
+		reflect.ValueOf(actual).Kind() == reflect.Interface) && !reflect.ValueOf(actual).IsNil() {
+		t.Logf(`%s %v - Not nill`, success, prettyPrint(actual))
 	} else {
-		t.Fatalf(`%s Exptected not nil`, failed)
+		t.Fatalf(`%s Exptected not nil but: %v`, failed, prettyPrint(actual))
 	}
 }
 

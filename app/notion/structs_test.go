@@ -679,6 +679,7 @@ func TestUpdatePage(t *testing.T) {
 }
 
 func TestUnmarshalPage(t *testing.T) {
+
 	jsn := `
 	{
 		"object": "page",
@@ -1062,4 +1063,604 @@ func TestUnmarshalPage(t *testing.T) {
 	utils.AssertEqualsString(t, "default", *v.Title[0].Annotations.Color)
 	utils.AssertEqualsString(t, "Hello", *v.Title[0].PlainText)
 	utils.AssertNil(t, v.Title[0].Href)
+}
+
+func TestUnmarshalRichTextBlock(t *testing.T) {
+
+	jsn := `
+	{
+			"object": "page",
+			"id": "8cb8ae71-33b5-4802-a3ed-be7dec66b25c",
+			"created_time": "2022-05-16T21:42:00.000Z",
+			"last_edited_time": "2022-05-16T21:52:00.000Z",
+			"created_by": {
+			  "object": "user",
+			  "id": "c7f2ae70-6b98-438f-8564-c59a71d7b3a4"
+			},
+			"last_edited_by": {
+			  "object": "user",
+			  "id": "c7f2ae70-6b98-438f-8564-c59a71d7b3a4"
+			},
+			"cover": null,
+			"icon": null,
+			"parent": {
+			  "type": "database_id",
+			  "database_id": "fffa4d9f-5e46-40e6-8152-90991ad32919"
+			},
+			"archived": false,
+			"properties": {
+			  "Data": {
+				"id": "cbZT",
+				"type": "rich_text",
+				"rich_text": [
+				  {
+					"type": "text",
+					"text": {
+					  "content": "Hello",
+					  "link": null
+					},
+					"annotations": {
+					  "bold": true,
+					  "italic": false,
+					  "strikethrough": false,
+					  "underline": false,
+					  "code": false,
+					  "color": "default"
+					},
+					"plain_text": "Hello",
+					"href": null
+				  },
+				  {
+					"type": "text",
+					"text": {
+					  "content": " it’s ",
+					  "link": null
+					},
+					"annotations": {
+					  "bold": false,
+					  "italic": false,
+					  "strikethrough": false,
+					  "underline": false,
+					  "code": false,
+					  "color": "default"
+					},
+					"plain_text": " it’s ",
+					"href": null
+				  },
+				  {
+					"type": "text",
+					"text": {
+					  "content": "formatted",
+					  "link": null
+					},
+					"annotations": {
+					  "bold": false,
+					  "italic": true,
+					  "strikethrough": false,
+					  "underline": false,
+					  "code": false,
+					  "color": "default"
+					},
+					"plain_text": "formatted",
+					"href": null
+				  },
+				  {
+					"type": "text",
+					"text": {
+					  "content": " ",
+					  "link": null
+					},
+					"annotations": {
+					  "bold": false,
+					  "italic": false,
+					  "strikethrough": false,
+					  "underline": false,
+					  "code": false,
+					  "color": "default"
+					},
+					"plain_text": " ",
+					"href": null
+				  },
+				  {
+					"type": "text",
+					"text": {
+					  "content": "rich",
+					  "link": null
+					},
+					"annotations": {
+					  "bold": false,
+					  "italic": false,
+					  "strikethrough": false,
+					  "underline": true,
+					  "code": false,
+					  "color": "default"
+					},
+					"plain_text": "rich",
+					"href": null
+				  },
+				  {
+					"type": "text",
+					"text": {
+					  "content": " ",
+					  "link": null
+					},
+					"annotations": {
+					  "bold": false,
+					  "italic": false,
+					  "strikethrough": false,
+					  "underline": false,
+					  "code": false,
+					  "color": "default"
+					},
+					"plain_text": " ",
+					"href": null
+				  },
+				  {
+					"type": "text",
+					"text": {
+					  "content": "text",
+					  "link": null
+					},
+					"annotations": {
+					  "bold": false,
+					  "italic": false,
+					  "strikethrough": true,
+					  "underline": false,
+					  "code": false,
+					  "color": "default"
+					},
+					"plain_text": "text",
+					"href": null
+				  },
+				  {
+					"type": "text",
+					"text": {
+					  "content": " ",
+					  "link": null
+					},
+					"annotations": {
+					  "bold": false,
+					  "italic": false,
+					  "strikethrough": false,
+					  "underline": false,
+					  "code": false,
+					  "color": "default"
+					},
+					"plain_text": " ",
+					"href": null
+				  },
+				  {
+					"type": "text",
+					"text": {
+					  "content": "block I",
+					  "link": null
+					},
+					"annotations": {
+					  "bold": false,
+					  "italic": false,
+					  "strikethrough": false,
+					  "underline": false,
+					  "code": true,
+					  "color": "default"
+					},
+					"plain_text": "block I",
+					"href": null
+				  },
+				  {
+					"type": "text",
+					"text": {
+					  "content": "t has",
+					  "link": null
+					},
+					"annotations": {
+					  "bold": false,
+					  "italic": false,
+					  "strikethrough": false,
+					  "underline": false,
+					  "code": true,
+					  "color": "gray"
+					},
+					"plain_text": "t has",
+					"href": null
+				  },
+				  {
+					"type": "text",
+					"text": {
+					  "content": " ",
+					  "link": null
+					},
+					"annotations": {
+					  "bold": false,
+					  "italic": false,
+					  "strikethrough": false,
+					  "underline": false,
+					  "code": true,
+					  "color": "default"
+					},
+					"plain_text": " ",
+					"href": null
+				  },
+				  {
+					"type": "text",
+					"text": {
+					  "content": "many ",
+					  "link": null
+					},
+					"annotations": {
+					  "bold": false,
+					  "italic": false,
+					  "strikethrough": false,
+					  "underline": false,
+					  "code": false,
+					  "color": "default"
+					},
+					"plain_text": "many ",
+					"href": null
+				  },
+				  {
+					"type": "equation",
+					"equation": {
+					  "expression": "different"
+					},
+					"annotations": {
+					  "bold": false,
+					  "italic": false,
+					  "strikethrough": false,
+					  "underline": false,
+					  "code": false,
+					  "color": "default"
+					},
+					"plain_text": "different",
+					"href": null
+				  },
+				  {
+					"type": "text",
+					"text": {
+					  "content": " formattings and of course it has a link ",
+					  "link": null
+					},
+					"annotations": {
+					  "bold": false,
+					  "italic": false,
+					  "strikethrough": false,
+					  "underline": false,
+					  "code": false,
+					  "color": "default"
+					},
+					"plain_text": " formattings and of course it has a link ",
+					"href": null
+				  },
+				  {
+					"type": "text",
+					"text": {
+					  "content": "https://stackoverflow.com/questions/53731271/how-to-trigger-parameter-hints-in-visual-studio-code",
+					  "link": {
+						"url": "https://stackoverflow.com/questions/53731271/how-to-trigger-parameter-hints-in-visual-studio-code"
+					  }
+					},
+					"annotations": {
+					  "bold": false,
+					  "italic": false,
+					  "strikethrough": false,
+					  "underline": false,
+					  "code": false,
+					  "color": "default"
+					},
+					"plain_text": "https://stackoverflow.com/questions/53731271/how-to-trigger-parameter-hints-in-visual-studio-code",
+					"href": "https://stackoverflow.com/questions/53731271/how-to-trigger-parameter-hints-in-visual-studio-code"
+				  }
+				]
+			  },
+			  "Name": {
+				"id": "title",
+				"type": "title",
+				"title": [
+				  {
+					"type": "text",
+					"text": {
+					  "content": "simple key",
+					  "link": null
+					},
+					"annotations": {
+					  "bold": false,
+					  "italic": false,
+					  "strikethrough": false,
+					  "underline": false,
+					  "code": false,
+					  "color": "default"
+					},
+					"plain_text": "simple key",
+					"href": null
+				  }
+				]
+			  }
+			},
+			"url": "https://www.notion.so/simple-key-8cb8ae7133b54802a3edbe7dec66b25c"
+	  }
+	`
+
+	var page notion.Page
+	json.Unmarshal([]byte(jsn), &page)
+
+	utils.AssertEqualsString(t, "8cb8ae71-33b5-4802-a3ed-be7dec66b25c", *page.ID)
+
+	utils.AssertNotNill(t, page.CreatedBy)
+	utils.AssertEqualsString(t, "c7f2ae70-6b98-438f-8564-c59a71d7b3a4", *page.CreatedBy.ID)
+	utils.AssertEqualsString(t, "user", *page.CreatedBy.Object)
+
+	utils.AssertNotNill(t, page.LastEditedBy)
+	utils.AssertEqualsString(t, "c7f2ae70-6b98-438f-8564-c59a71d7b3a4", *page.LastEditedBy.ID)
+	utils.AssertEqualsString(t, "user", *page.LastEditedBy.Object)
+
+	utils.AssertNil(t, page.Cover)
+	utils.AssertNil(t, page.Icon)
+
+	utils.AssertNotNill(t, page.Parent)
+	utils.AssertEqualsString(t, "database_id", *page.Parent.Type)
+	utils.AssertEqualsString(t, "fffa4d9f-5e46-40e6-8152-90991ad32919", *page.Parent.DatabaseID)
+
+	utils.AssertEqualsBool(t, false, *page.Archived)
+
+	utils.AssertNotNill(t, page.Properties)
+
+	props := page.Properties.(notion.PageProperties)
+
+	data, ok := props["Data"]
+	utils.AssertEqualsBool(t, true, ok)
+	utils.AssertEqualsString(t, "cbZT", *data.ID)
+	utils.AssertEqualsString(t, "rich_text", *data.Type)
+	utils.AssertNotNill(t, data.RichText)
+	richText := data.RichText
+
+	utils.AssertEqualsInt(t, 15, len(richText))
+
+	rt := richText[0]
+	utils.AssertEqualsString(t, "text", *rt.Type)
+	utils.AssertNotNill(t, rt.Text)
+	utils.AssertEqualsString(t, "Hello", *rt.Text.Content)
+	utils.AssertNil(t, rt.Text.Link)
+	utils.AssertNotNill(t, rt.Annotations)
+	utils.AssertEqualsBool(t, true, *rt.Annotations.Bold)
+	utils.AssertEqualsBool(t, false, *rt.Annotations.Italic)
+	utils.AssertEqualsBool(t, false, *rt.Annotations.Strikethrough)
+	utils.AssertEqualsBool(t, false, *rt.Annotations.Underline)
+	utils.AssertEqualsBool(t, false, *rt.Annotations.Code)
+	utils.AssertEqualsString(t, "default", *rt.Annotations.Color)
+	utils.AssertEqualsString(t, "Hello", *rt.PlainText)
+	utils.AssertNil(t, rt.Href)
+
+	rt = richText[1]
+	utils.AssertEqualsString(t, "text", *rt.Type)
+	utils.AssertNotNill(t, rt.Text)
+	utils.AssertEqualsString(t, " it’s ", *rt.Text.Content)
+	utils.AssertNil(t, rt.Text.Link)
+	utils.AssertNotNill(t, rt.Annotations)
+	utils.AssertEqualsBool(t, false, *rt.Annotations.Bold)
+	utils.AssertEqualsBool(t, false, *rt.Annotations.Italic)
+	utils.AssertEqualsBool(t, false, *rt.Annotations.Strikethrough)
+	utils.AssertEqualsBool(t, false, *rt.Annotations.Underline)
+	utils.AssertEqualsBool(t, false, *rt.Annotations.Code)
+	utils.AssertEqualsString(t, "default", *rt.Annotations.Color)
+	utils.AssertEqualsString(t, " it’s ", *rt.PlainText)
+	utils.AssertNil(t, rt.Href)
+
+	rt = richText[2]
+	utils.AssertEqualsString(t, "text", *rt.Type)
+	utils.AssertNotNill(t, rt.Text)
+	utils.AssertEqualsString(t, "formatted", *rt.Text.Content)
+	utils.AssertNil(t, rt.Text.Link)
+	utils.AssertNotNill(t, rt.Annotations)
+	utils.AssertEqualsBool(t, false, *rt.Annotations.Bold)
+	utils.AssertEqualsBool(t, true, *rt.Annotations.Italic)
+	utils.AssertEqualsBool(t, false, *rt.Annotations.Strikethrough)
+	utils.AssertEqualsBool(t, false, *rt.Annotations.Underline)
+	utils.AssertEqualsBool(t, false, *rt.Annotations.Code)
+	utils.AssertEqualsString(t, "default", *rt.Annotations.Color)
+	utils.AssertEqualsString(t, "formatted", *rt.PlainText)
+	utils.AssertNil(t, rt.Href)
+
+	rt = richText[3]
+	utils.AssertEqualsString(t, "text", *rt.Type)
+	utils.AssertNotNill(t, rt.Text)
+	utils.AssertEqualsString(t, " ", *rt.Text.Content)
+	utils.AssertNil(t, rt.Text.Link)
+	utils.AssertNotNill(t, rt.Annotations)
+	utils.AssertEqualsBool(t, false, *rt.Annotations.Bold)
+	utils.AssertEqualsBool(t, false, *rt.Annotations.Italic)
+	utils.AssertEqualsBool(t, false, *rt.Annotations.Strikethrough)
+	utils.AssertEqualsBool(t, false, *rt.Annotations.Underline)
+	utils.AssertEqualsBool(t, false, *rt.Annotations.Code)
+	utils.AssertEqualsString(t, "default", *rt.Annotations.Color)
+	utils.AssertEqualsString(t, " ", *rt.PlainText)
+	utils.AssertNil(t, rt.Href)
+
+	rt = richText[4]
+	utils.AssertEqualsString(t, "text", *rt.Type)
+	utils.AssertNotNill(t, rt.Text)
+	utils.AssertEqualsString(t, "rich", *rt.Text.Content)
+	utils.AssertNil(t, rt.Text.Link)
+	utils.AssertNotNill(t, rt.Annotations)
+	utils.AssertEqualsBool(t, false, *rt.Annotations.Bold)
+	utils.AssertEqualsBool(t, false, *rt.Annotations.Italic)
+	utils.AssertEqualsBool(t, false, *rt.Annotations.Strikethrough)
+	utils.AssertEqualsBool(t, true, *rt.Annotations.Underline)
+	utils.AssertEqualsBool(t, false, *rt.Annotations.Code)
+	utils.AssertEqualsString(t, "default", *rt.Annotations.Color)
+	utils.AssertEqualsString(t, "rich", *rt.PlainText)
+	utils.AssertNil(t, rt.Href)
+
+	rt = richText[5]
+	utils.AssertEqualsString(t, "text", *rt.Type)
+	utils.AssertNotNill(t, rt.Text)
+	utils.AssertEqualsString(t, " ", *rt.Text.Content)
+	utils.AssertNil(t, rt.Text.Link)
+	utils.AssertNotNill(t, rt.Annotations)
+	utils.AssertEqualsBool(t, false, *rt.Annotations.Bold)
+	utils.AssertEqualsBool(t, false, *rt.Annotations.Italic)
+	utils.AssertEqualsBool(t, false, *rt.Annotations.Strikethrough)
+	utils.AssertEqualsBool(t, false, *rt.Annotations.Underline)
+	utils.AssertEqualsBool(t, false, *rt.Annotations.Code)
+	utils.AssertEqualsString(t, "default", *rt.Annotations.Color)
+	utils.AssertEqualsString(t, " ", *rt.PlainText)
+	utils.AssertNil(t, rt.Href)
+
+	rt = richText[6]
+	utils.AssertEqualsString(t, "text", *rt.Type)
+	utils.AssertNotNill(t, rt.Text)
+	utils.AssertEqualsString(t, "text", *rt.Text.Content)
+	utils.AssertNil(t, rt.Text.Link)
+	utils.AssertNotNill(t, rt.Annotations)
+	utils.AssertEqualsBool(t, false, *rt.Annotations.Bold)
+	utils.AssertEqualsBool(t, false, *rt.Annotations.Italic)
+	utils.AssertEqualsBool(t, true, *rt.Annotations.Strikethrough)
+	utils.AssertEqualsBool(t, false, *rt.Annotations.Underline)
+	utils.AssertEqualsBool(t, false, *rt.Annotations.Code)
+	utils.AssertEqualsString(t, "default", *rt.Annotations.Color)
+	utils.AssertEqualsString(t, "text", *rt.PlainText)
+	utils.AssertNil(t, rt.Href)
+
+	rt = richText[7]
+	utils.AssertEqualsString(t, "text", *rt.Type)
+	utils.AssertNotNill(t, rt.Text)
+	utils.AssertEqualsString(t, " ", *rt.Text.Content)
+	utils.AssertNil(t, rt.Text.Link)
+	utils.AssertNotNill(t, rt.Annotations)
+	utils.AssertEqualsBool(t, false, *rt.Annotations.Bold)
+	utils.AssertEqualsBool(t, false, *rt.Annotations.Italic)
+	utils.AssertEqualsBool(t, false, *rt.Annotations.Strikethrough)
+	utils.AssertEqualsBool(t, false, *rt.Annotations.Underline)
+	utils.AssertEqualsBool(t, false, *rt.Annotations.Code)
+	utils.AssertEqualsString(t, "default", *rt.Annotations.Color)
+	utils.AssertEqualsString(t, " ", *rt.PlainText)
+	utils.AssertNil(t, rt.Href)
+
+	rt = richText[8]
+	utils.AssertEqualsString(t, "text", *rt.Type)
+	utils.AssertNotNill(t, rt.Text)
+	utils.AssertEqualsString(t, "block I", *rt.Text.Content)
+	utils.AssertNil(t, rt.Text.Link)
+	utils.AssertNotNill(t, rt.Annotations)
+	utils.AssertEqualsBool(t, false, *rt.Annotations.Bold)
+	utils.AssertEqualsBool(t, false, *rt.Annotations.Italic)
+	utils.AssertEqualsBool(t, false, *rt.Annotations.Strikethrough)
+	utils.AssertEqualsBool(t, false, *rt.Annotations.Underline)
+	utils.AssertEqualsBool(t, true, *rt.Annotations.Code)
+	utils.AssertEqualsString(t, "default", *rt.Annotations.Color)
+	utils.AssertEqualsString(t, "block I", *rt.PlainText)
+	utils.AssertNil(t, rt.Href)
+
+	rt = richText[9]
+	utils.AssertEqualsString(t, "text", *rt.Type)
+	utils.AssertNotNill(t, rt.Text)
+	utils.AssertEqualsString(t, "t has", *rt.Text.Content)
+	utils.AssertNil(t, rt.Text.Link)
+	utils.AssertNotNill(t, rt.Annotations)
+	utils.AssertEqualsBool(t, false, *rt.Annotations.Bold)
+	utils.AssertEqualsBool(t, false, *rt.Annotations.Italic)
+	utils.AssertEqualsBool(t, false, *rt.Annotations.Strikethrough)
+	utils.AssertEqualsBool(t, false, *rt.Annotations.Underline)
+	utils.AssertEqualsBool(t, true, *rt.Annotations.Code)
+	utils.AssertEqualsString(t, "gray", *rt.Annotations.Color)
+	utils.AssertEqualsString(t, "t has", *rt.PlainText)
+	utils.AssertNil(t, rt.Href)
+
+	rt = richText[10]
+	utils.AssertEqualsString(t, "text", *rt.Type)
+	utils.AssertNotNill(t, rt.Text)
+	utils.AssertEqualsString(t, " ", *rt.Text.Content)
+	utils.AssertNil(t, rt.Text.Link)
+	utils.AssertNotNill(t, rt.Annotations)
+	utils.AssertEqualsBool(t, false, *rt.Annotations.Bold)
+	utils.AssertEqualsBool(t, false, *rt.Annotations.Italic)
+	utils.AssertEqualsBool(t, false, *rt.Annotations.Strikethrough)
+	utils.AssertEqualsBool(t, false, *rt.Annotations.Underline)
+	utils.AssertEqualsBool(t, true, *rt.Annotations.Code)
+	utils.AssertEqualsString(t, "default", *rt.Annotations.Color)
+	utils.AssertEqualsString(t, " ", *rt.PlainText)
+	utils.AssertNil(t, rt.Href)
+
+	rt = richText[11]
+	utils.AssertEqualsString(t, "text", *rt.Type)
+	utils.AssertNotNill(t, rt.Text)
+	utils.AssertEqualsString(t, "many ", *rt.Text.Content)
+	utils.AssertNil(t, rt.Text.Link)
+	utils.AssertNotNill(t, rt.Annotations)
+	utils.AssertEqualsBool(t, false, *rt.Annotations.Bold)
+	utils.AssertEqualsBool(t, false, *rt.Annotations.Italic)
+	utils.AssertEqualsBool(t, false, *rt.Annotations.Strikethrough)
+	utils.AssertEqualsBool(t, false, *rt.Annotations.Underline)
+	utils.AssertEqualsBool(t, false, *rt.Annotations.Code)
+	utils.AssertEqualsString(t, "default", *rt.Annotations.Color)
+	utils.AssertEqualsString(t, "many ", *rt.PlainText)
+	utils.AssertNil(t, rt.Href)
+
+	rt = richText[12]
+	utils.AssertEqualsString(t, "equation", *rt.Type)
+	utils.AssertNotNill(t, rt.Equation)
+	utils.AssertEqualsString(t, "different", *rt.Equation.Expression)
+	utils.AssertNotNill(t, rt.Annotations)
+	utils.AssertEqualsBool(t, false, *rt.Annotations.Bold)
+	utils.AssertEqualsBool(t, false, *rt.Annotations.Italic)
+	utils.AssertEqualsBool(t, false, *rt.Annotations.Strikethrough)
+	utils.AssertEqualsBool(t, false, *rt.Annotations.Underline)
+	utils.AssertEqualsBool(t, false, *rt.Annotations.Code)
+	utils.AssertEqualsString(t, "default", *rt.Annotations.Color)
+	utils.AssertEqualsString(t, "different", *rt.PlainText)
+	utils.AssertNil(t, rt.Href)
+
+	rt = richText[13]
+	utils.AssertEqualsString(t, "text", *rt.Type)
+	utils.AssertNotNill(t, rt.Text)
+	utils.AssertEqualsString(t, " formattings and of course it has a link ", *rt.Text.Content)
+	utils.AssertNil(t, rt.Text.Link)
+	utils.AssertNotNill(t, rt.Annotations)
+	utils.AssertEqualsBool(t, false, *rt.Annotations.Bold)
+	utils.AssertEqualsBool(t, false, *rt.Annotations.Italic)
+	utils.AssertEqualsBool(t, false, *rt.Annotations.Strikethrough)
+	utils.AssertEqualsBool(t, false, *rt.Annotations.Underline)
+	utils.AssertEqualsBool(t, false, *rt.Annotations.Code)
+	utils.AssertEqualsString(t, "default", *rt.Annotations.Color)
+	utils.AssertEqualsString(t, " formattings and of course it has a link ", *rt.PlainText)
+	utils.AssertNil(t, rt.Href)
+
+	rt = richText[14]
+	utils.AssertEqualsString(t, "text", *rt.Type)
+	utils.AssertNotNill(t, rt.Text)
+	utils.AssertEqualsString(t, "https://stackoverflow.com/questions/53731271/how-to-trigger-parameter-hints-in-visual-studio-code", *rt.Text.Content)
+	utils.AssertNotNill(t, rt.Text.Link)
+	utils.AssertEqualsString(t, "https://stackoverflow.com/questions/53731271/how-to-trigger-parameter-hints-in-visual-studio-code", *rt.Text.Link.URL)
+	utils.AssertNotNill(t, rt.Annotations)
+	utils.AssertEqualsBool(t, false, *rt.Annotations.Bold)
+	utils.AssertEqualsBool(t, false, *rt.Annotations.Italic)
+	utils.AssertEqualsBool(t, false, *rt.Annotations.Strikethrough)
+	utils.AssertEqualsBool(t, false, *rt.Annotations.Underline)
+	utils.AssertEqualsBool(t, false, *rt.Annotations.Code)
+	utils.AssertEqualsString(t, "default", *rt.Annotations.Color)
+	utils.AssertEqualsString(t, "https://stackoverflow.com/questions/53731271/how-to-trigger-parameter-hints-in-visual-studio-code", *rt.PlainText)
+	utils.AssertEqualsString(t, "https://stackoverflow.com/questions/53731271/how-to-trigger-parameter-hints-in-visual-studio-code", *rt.Href)
+
+	key, ok := props["Name"]
+	utils.AssertEqualsBool(t, true, ok)
+	utils.AssertEqualsString(t, "title", *key.ID)
+	utils.AssertEqualsString(t, "title", *key.Type)
+	utils.AssertNotNill(t, key.Title)
+	title := key.Title
+	utils.AssertEqualsInt(t, 1, len(title))
+	t1 := title[0]
+	utils.AssertEqualsString(t, "text", *t1.Type)
+	utils.AssertNotNill(t, t1.Text)
+	utils.AssertEqualsString(t, "simple key", *t1.Text.Content)
+	utils.AssertNil(t, t1.Text.Link)
+	utils.AssertNotNill(t, t1.Annotations)
+	utils.AssertEqualsBool(t, false, *t1.Annotations.Bold)
+	utils.AssertEqualsBool(t, false, *t1.Annotations.Italic)
+	utils.AssertEqualsBool(t, false, *t1.Annotations.Strikethrough)
+	utils.AssertEqualsBool(t, false, *t1.Annotations.Underline)
+	utils.AssertEqualsBool(t, false, *t1.Annotations.Code)
+	utils.AssertEqualsString(t, "default", *t1.Annotations.Color)
+	utils.AssertEqualsString(t, "simple key", *t1.PlainText)
+	utils.AssertNil(t, t1.Href)
+
+	utils.AssertEqualsString(t, "https://www.notion.so/simple-key-8cb8ae7133b54802a3edbe7dec66b25c", *page.URL)
+
 }
