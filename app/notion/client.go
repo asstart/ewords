@@ -5,10 +5,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/asstart/english-words/app/utils"
 	"io/ioutil"
 	"net/http"
 	"time"
-	// "strconv"
 )
 
 const BaseUrl = "https://api.notion.com"
@@ -53,7 +53,7 @@ func (nc *NotionClient) doRequest(req *http.Request) ([]byte, error) {
 	}
 
 	if resp.StatusCode < http.StatusOK || resp.StatusCode >= http.StatusBadRequest {
-		return []byte{}, fmt.Errorf("error in request: %v, status code: %v, body: %v", req.URL, resp.StatusCode, string(body))
+		return []byte{}, fmt.Errorf("error in request: %v, status code: %v, body: %v", req.URL, resp.StatusCode, utils.PrettyPrint(body))
 	}
 
 	return body, nil
@@ -79,7 +79,6 @@ func (nc *NotionClient) QueryDatabase(ctx context.Context, query DatabaseQuery, 
 	var pages DatabasePages
 	err = json.Unmarshal(body, &pages)
 	if err != nil {
-		fmt.Println(err)
 		return DatabasePages{}, err
 	}
 	return pages, nil

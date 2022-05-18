@@ -18,27 +18,27 @@ NOTION_API_KEY="API_KEY" go test -v -tags=integration
 ### Usage
 
 ```shell
-  -ed
-        export defenitions
-  -ee
-        export examples
-  -f    export to a file
-  -sd string
-        path to a source directory
-  -sf string
+Usage of ./ewords:
+  -file string
         path to a source file
-  -sn string
-        id of notion database
-  -tdd string
-        where store defenition output (default "ewords_defenition")
-  -ted string
-        where store example output (default "ewords_example")
+  -dir string
+        path to a source directory
+  -notion string
+        id of source notion database
+  -defenition
+        do export defenitions
+  -example
+        do export examples
+  -exdir string
+        where store examples output (default "ewords_example")
+  -defdir string
+        where store defenitions output (default "ewords_defenition")
 ```
 
 ### Export examples and defenitions from notions to a file
 
 ```shell
-NOTION_API_KEY="API_KEY" ewords -n <db_id> -f -ted -tdd
+NOTION_API_KEY="API_KEY" ./ewords -notion <db_id> -example -defenition -exdir <path> -defdir <path>
 ```
 
 ### Run tests from all packages

@@ -5,11 +5,12 @@ import (
 	"os"
 	"path"
 	"reflect"
-	"regexp"
+	"strings"
 	"time"
 
 	"github.com/asstart/english-words/app/ewords"
 	"github.com/asstart/english-words/app/parse"
+	"github.com/asstart/english-words/app/utils"
 	"github.com/spf13/afero"
 )
 
@@ -25,12 +26,11 @@ type options struct {
 	ExportDefenition bool
 	ExampleDir       string
 	DefenitionDir    string
-	ExportToFile     bool
 }
 
 func (op *options) SetString(field string, value *string) {
 	f := reflect.ValueOf(op).Elem().FieldByName(field)
-	f.SetString(*value)
+	f.SetString(strings.TrimSpace(*value))
 }
 
 func (op *options) SetBool(field string, value *bool) {
@@ -39,17 +39,18 @@ func (op *options) SetBool(field string, value *bool) {
 }
 
 func (op *options) SetInt(field string, value *int) {
+	f := reflect.ValueOf(op).Elem().FieldByName(field)
+	f.SetInt(int64(*value))
 }
 
 var flags = []*ewords.FlagDef{
-	{Flag: "sf", Field: "FilePath", Help: "path to a source file", Value: ""},
-	{Flag: "sd", Field: "DirPath", Help: "path to a source directory", Value: ""},
-	{Flag: "sn", Field: "NotionDB", Help: "id of notion database", Value: ""},
-	{Flag: "f", Field: "ExportToFile", Help: "export to a file", Value: false},
-	{Flag: "ee", Field: "ExportExample", Help: "export examples", Value: false},
-	{Flag: "ed", Field: "ExportDefenition", Help: "export defenitions", Value: false},
-	{Flag: "ted", Field: "ExampleDir", Help: "where store example output", Value: "ewords_example"},
-	{Flag: "tdd", Field: "DefenitionDir", Help: "where store defenition output", Value: "ewords_defenition"},
+	{Flag: "file", Field: "FilePath", Help: "path to a source file", Value: ""},
+	{Flag: "dir", Field: "DirPath", Help: "path to a source directory", Value: ""},
+	{Flag: "notion", Field: "NotionDB", Help: "id of source notion database", Value: ""},
+	{Flag: "example", Field: "ExportExample", Help: "do export examples", Value: false},
+	{Flag: "defenition", Field: "ExportDefenition", Help: "do export defenitions", Value: false},
+	{Flag: "exdir", Field: "ExampleDir", Help: "where store examples output", Value: "ewords_example"},
+	{Flag: "defdir", Field: "DefenitionDir", Help: "where store defenitions output", Value: "ewords_defenition"},
 }
 
 var op = options{}
@@ -60,15 +61,9 @@ func main() {
 		panic(err)
 	}
 
-	if op.FilePath == "" && op.DirPath == "" && op.NotionDB == "" {
-		panic("neither s nor d nor n were defined")
-	}
+	validateOptions()
 
-	if (op.FilePath != "" && op.DirPath != "") ||
-		(op.FilePath != "" && op.NotionDB != "") ||
-		(op.NotionDB != "" && op.DirPath != "") {
-		panic("only one option of (s, d, n) should be defined")
-	}
+	runMessage()
 
 	files := map[string][]ewords.TermSource{}
 
@@ -90,32 +85,88 @@ func main() {
 
 	}
 
-	if op.ExportToFile {
-		for file, ts := range files {
-			if op.ExportExample {
-				exportExamplesCmd(file, ts)
-			}
-			if op.ExportDefenition {
-				exportDefenitionsCmd(file, ts)
-			}
+	for file, ts := range files {
+		if op.ExportExample {
+			exportExamplesCmd(file, ts)
 		}
-
+		if op.ExportDefenition {
+			exportDefenitionsCmd(file, ts)
+		}
 	}
 
 }
 
+func validateOptions() {
+
+	if !needExport() {
+		panic("at least one option should be set: example, defenition")
+	}
+	if !sourceSet() {
+		panic("source should be set: file, notion, dir")
+	}
+	if !oneSource() {
+		panic("only one source should be set: file, notion, dir")
+	}
+	if !dirCanBeCreated(op.ExampleDir) {
+		panic(fmt.Sprintf("dir %v can't be created", op.ExampleDir))
+	}
+	if !dirCanBeCreated(op.DefenitionDir) {
+		panic(fmt.Sprintf("dir %v can't be created", op.DefenitionDir))
+	}
+}
+
+func needExport() bool {
+	return op.ExportDefenition || op.ExportExample
+}
+
+func sourceSet() bool {
+	return op.FilePath != "" || op.DirPath != "" || op.NotionDB != ""
+}
+
+func oneSource() bool {
+	return (op.NotionDB != "" && op.FilePath == "" && op.DirPath == "") ||
+		(op.NotionDB == "" && op.FilePath != "" && op.DirPath == "") ||
+		(op.NotionDB == "" && op.FilePath == "" && op.DirPath != "")
+}
+
+func runMessage() {
+	var source string
+	if op.NotionDB != "" {
+		source = fmt.Sprintf("notion db %v", op.NotionDB)
+	} else if op.FilePath != "" {
+		source = fmt.Sprintf("file %v", op.FilePath)
+	} else if op.DirPath != "" {
+		source = fmt.Sprintf("directory %v", op.DirPath)
+	} else {
+		panic(fmt.Sprintf("You shouldn't be here. Check opts: %v", utils.PrettyPrint(op)))
+	}
+
+	var result string
+	if op.ExportExample {
+		path, _ := ewords.RealPath(op.ExampleDir)
+		result += fmt.Sprintf("examples will be saved to %v\n", path)
+	}
+	if op.ExportDefenition {
+		path, _ := ewords.RealPath(op.DefenitionDir)
+		result += fmt.Sprintf("defenitions will be saved to %v\n", path)
+	}
+
+	fmt.Printf("Source: %v\nTargets:\n%v", source, result)
+}
+
+func dirCanBeCreated(dir string) bool {
+	res, _ := ewords.DirCanBeCreated(&dir, AppFS)
+	return res == ewords.DirExists || res == ewords.CanCreate
+}
+
 func exportExamplesCmd(file string, ts []ewords.TermSource) {
-	filename := path.Base(file)
-	pattern, _ := regexp.Compile("[.]")
-	eout := pattern.ReplaceAllString(filename, "-examples.")
-	exportExamples(ts, path.Join(op.ExampleDir, eout))
+	filename := fmt.Sprintf("%v-examples", path.Base(file))
+	exportExamples(ts, path.Join(op.ExampleDir, filename))
 }
 
 func exportDefenitionsCmd(file string, ts []ewords.TermSource) {
-	filename := path.Base(file)
-	pattern, _ := regexp.Compile("[.]")
-	dout := pattern.ReplaceAllString(filename, "-defenitions.")
-	exportDefenitions(ts, path.Join(op.DefenitionDir, dout))
+	filename := fmt.Sprintf("%v-defenitions", path.Base(file))
+	exportDefenitions(ts, path.Join(op.DefenitionDir, filename))
 }
 
 func exportExamples(ts []ewords.TermSource, exmplFile string) {
@@ -163,7 +214,7 @@ func parseNotionCmd(db string) []ewords.TermSource {
 		},
 	)
 	if err != nil {
-		panic(fmt.Sprintf("Errow while parsing Notion source to TermSource - %v", err))
+		panic(fmt.Sprintf("error while parsing Notion source to TermSource - %v", err))
 	}
 	return ts
 }

@@ -3,11 +3,94 @@ package ewords
 import (
 	"errors"
 	"fmt"
-	"github.com/spf13/afero"
 	"log"
 	"path"
+	"path/filepath"
+
+	// "strconv"
 	"strings"
+
+	"github.com/spf13/afero"
 )
+
+const (
+	CanCreate = iota
+	DirExists
+	Error
+)
+
+func IsDirExists(dir *string, fs afero.Fs) (bool, error) {
+	return afero.DirExists(fs, *dir)
+}
+
+func DirCanBeCreated(dir *string, fs afero.Fs) (int, error) {
+	rp, err := RealPath(*dir)
+	if err != nil {
+		return Error, err
+	}
+
+	exists, err := IsDirExists(&rp, fs)
+	if err != nil {
+		return Error, err
+	}
+	if exists {
+		return DirExists, nil
+	}
+
+	deleteTarget, err := FindFirstUnexisted(rp, fs)
+	if err != nil {
+		return Error, err
+	}
+
+	err = fs.MkdirAll(rp, 0777)
+	if err != nil {
+		return Error, err
+	}
+	err = fs.RemoveAll(deleteTarget)
+	if err != nil {
+		return Error, err
+	}
+	return CanCreate, nil
+}
+
+func FindFirstUnexisted(dir string, fs afero.Fs) (string, error) {
+	fromroot := strings.HasPrefix(dir, "/")
+	if !fromroot {
+		return "", fmt.Errorf("path: %v should be abs", dir)
+	}
+	if dir == "/" {
+		return "", fmt.Errorf("path: %v should not be passed here", dir)
+	}
+	var deleteTarget string
+	curr := dir
+	stop := false
+	for !stop {
+		parent := path.Dir(curr)
+		ex, err := IsDirExists(&parent, fs)
+		if err != nil {
+			return "", err
+		}
+		if ex {
+			deleteTarget = curr
+			stop = true
+		} else {
+			curr = parent
+		}
+	}
+	return deleteTarget, nil
+}
+
+func RealPath(path string) (string, error) {
+	cleaned := filepath.Clean(path)
+	if filepath.IsAbs(cleaned) {
+		return cleaned, nil
+	}
+	abs, err := filepath.Abs(cleaned)
+	if err != nil {
+		return "", err
+	}
+	return abs, nil
+}
 
 func ReadDir(dirPath *string, fs afero.Fs) (map[string]string, error) {
 	afs := &afero.Afero{Fs: fs}

@@ -219,3 +219,107 @@ func TestWriteFileToNotExistedDir(t *testing.T) {
 
 	utils.AssertEqualsString(t, fc, res)
 }
+
+func TestDirExists(t *testing.T) {
+	memFs := afero.NewMemMapFs()
+
+	memFs.Mkdir("/dir", 0777)
+
+	res, err := ewords.IsDirExists(utils.StrPtr("/dir"), memFs)
+	utils.AssertNil(t, err)
+	utils.AssertEqualsBool(t, true, res)
+}
+
+func TestDirNotExists(t *testing.T) {
+	memFs := afero.NewMemMapFs()
+
+	res, err := ewords.IsDirExists(utils.StrPtr("/dir"), memFs)
+	utils.AssertNil(t, err)
+	utils.AssertEqualsBool(t, false, res)
+}
+
+func TestFindFirstUnexisted(t *testing.T) {
+
+	memFs := afero.NewMemMapFs()
+
+	memFs.MkdirAll("/data", 0777)
+	memFs.Mkdir("/", 0777)
+
+	p1 := "/"
+	p2 := "/data/dir1"
+	p3 := "/data/dir1/dir2"
+	p4 := "."
+
+	res, err := ewords.FindFirstUnexisted(p1, memFs)
+	utils.AssertNotNill(t, err)
+	utils.AssertEqualsString(t, "path: / should not be passed here", err.Error())
+	utils.AssertEmptyString(t, res)
+
+	res, err = ewords.FindFirstUnexisted(p2, memFs)
+	utils.AssertNil(t, err)
+	utils.AssertEqualsString(t, "/data/dir1", res)
+
+	res, err = ewords.FindFirstUnexisted(p3, memFs)
+	utils.AssertNil(t, err)
+	utils.AssertEqualsString(t, "/data/dir1", res)
+
+	_, err = ewords.FindFirstUnexisted(p4, memFs)
+	utils.AssertNotNill(t, err)
+	utils.AssertEqualsString(t, "path: . should be abs", err.Error())
+}
+
+func TestDirCanBeCreatedDirExists(t *testing.T) {
+	memFs := afero.NewMemMapFs()
+
+	dir1 := "/dir"
+	memFs.Mkdir(dir1, 0777)
+
+	res, err := ewords.DirCanBeCreated(&dir1, memFs)
+	utils.AssertNil(t, err)
+	utils.AssertEqualsInt(t, ewords.DirExists, res)
+
+	dir2 := "/data/dir2"
+	dir2Unnorm := "/data/dir/../.././data/dir2"
+	memFs.MkdirAll(dir2, 0777)
+	res, err = ewords.DirCanBeCreated(&dir2Unnorm, memFs)
+	utils.AssertNil(t, err)
+	utils.AssertEqualsInt(t, ewords.DirExists, res)
+
+	dir3 := "/"
+	res, err = ewords.DirCanBeCreated(&dir3, memFs)
+	utils.AssertNil(t, err)
+	utils.AssertEqualsInt(t, ewords.DirExists, res)
+}
+
+func TestDictCanBeCreatedDirNotExists(t *testing.T) {
+	memFs := afero.NewMemMapFs()
+	aMemFs := &afero.Afero{Fs: memFs}
+	root := "/"
+	memFs.Mkdir(root, 0777)
+
+	dir1 := "/data/dir"
+	res, err := ewords.DirCanBeCreated(&dir1, memFs)
+	utils.AssertNil(t, err)
+	utils.AssertEqualsInt(t, ewords.CanCreate, res)
+	ex, err := aMemFs.DirExists(dir1)
+	utils.AssertNil(t, err)
+	utils.AssertEqualsBool(t, false, ex)
+
+	memFs = afero.NewMemMapFs()
+	aMemFs = &afero.Afero{Fs: memFs}
+	root2 := "/volume"
+	memFs.MkdirAll(root2, 0777)
+	dir2 := "/volume/vm1/dir"
+	res, err = ewords.DirCanBeCreated(&dir2, memFs)
+	utils.AssertNil(t, err)
+	utils.AssertEqualsInt(t, ewords.CanCreate, res)
+	ex, err = aMemFs.DirExists(root2)
+	utils.AssertNil(t, err)
+	utils.AssertEqualsBool(t, true, ex)
+	ex, err = aMemFs.DirExists(dir2)
+	utils.AssertNil(t, err)
+	utils.AssertEqualsBool(t, false, ex)
+	ex, err = aMemFs.DirExists(path.Dir(dir2))
+	utils.AssertNil(t, err)
+	utils.AssertEqualsBool(t, false, ex)
+}
